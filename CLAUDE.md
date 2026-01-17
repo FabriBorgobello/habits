@@ -9,7 +9,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a full-stack React application built with TanStack Start (SSR framework), featuring authentication, database integration, and modern React patterns. The project uses file-based routing and includes both client-side and server-side rendering capabilities.
+This is a personal habit tracking application built with TanStack Start (SSR framework), featuring authentication, database integration, and modern React patterns. The project uses file-based routing and includes both client-side and server-side rendering capabilities.
+
+### Product Vision
+
+**MVP Scope**: Single-user habit tracker focused on simplicity and core tracking functionality.
+
+**Core Features**:
+- Daily and frequency-based habit tracking (e.g., 3x per week)
+- Category/tag organization (Health, Productivity, etc.)
+- Streak tracking and completion rates
+- Calendar view with completion history
+- Simple progress statistics
+
+**Out of Scope (Post-MVP)**: Notifications, advanced analytics, social features, mobile app, gamification, time-based or quantifiable tracking.
 
 ## Development Commands
 
@@ -92,12 +105,21 @@ Both route loaders (built into TanStack Router) and TanStack Query are available
 
 ### Authentication
 
-- **Better Auth**: Email/password auth configured in `src/lib/auth.ts`
-- **Setup**: Requires `BETTER_AUTH_SECRET` in `.env.local` (generate with `npx @better-auth/cli secret`)
+- **Better Auth**: Google OAuth configured in `src/lib/auth.ts`
+- **Provider**: Google OAuth 2.0 (single sign-on)
 - **Client**: Auth client setup in `src/lib/auth-client.ts`
 - **Routes**: Auth endpoints mounted at `/api/auth/*`
+- **Database**: User sessions and accounts stored in PostgreSQL
 
-Currently runs in stateless mode. To persist users, add a database connection to the Better Auth config and run migrations.
+**Required Secrets** (managed via Infisical at https://infisical.f0.ar):
+- `GOOGLE_CLIENT_ID`: OAuth client ID from Google Cloud Console
+- `GOOGLE_CLIENT_SECRET`: OAuth client secret from Google Cloud Console
+- `BETTER_AUTH_SECRET`: Session secret (generate with `npx @better-auth/cli secret`)
+- `DATABASE_URL`: PostgreSQL connection string
+
+**OAuth Redirect URIs** (configure in Google Cloud Console):
+- Development: `http://localhost:3000/api/auth/callback/google`
+- Production: `https://habits.f0.ar/api/auth/callback/google`
 
 ### Database
 
@@ -105,6 +127,36 @@ Currently runs in stateless mode. To persist users, add a database connection to
 - **Schema**: Defined in `src/db/schema.ts`
 - **Config**: `drizzle.config.ts` reads from `DATABASE_URL` in `.env.local`
 - **Connection**: Database client exported from `src/db/index.ts`
+
+**Data Model**:
+
+```typescript
+// habits table
+{
+  id: uuid (PK)
+  userId: uuid (FK -> users)
+  name: string
+  description: string?
+  category: string
+  colorHex: string?
+  icon: string?
+  frequency: 'daily' | 'custom'
+  frequencyConfig: json? // { type: 'weekly', count: 3 }
+  isArchived: boolean
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+
+// habit_completions table
+{
+  id: uuid (PK)
+  habitId: uuid (FK -> habits)
+  completedDate: date // date only, not timestamp
+  createdAt: timestamp
+}
+
+// Indexes: userId, habitId+completedDate (unique constraint)
+```
 
 ### Environment Variables
 
@@ -151,3 +203,65 @@ Files prefixed with `demo.` or in `src/routes/demo/` can be safely deleted. They
 - Database schema changes require running `pnpm db:generate` to create migrations
 - Server-side code can use Node.js APIs (fs, path, etc.)
 - Client-side code must use `VITE_` prefixed env vars
+
+## Code Patterns
+
+### Type Safety with Drizzle Zod
+
+Use `drizzle-zod` to extract Zod schemas from Drizzle table definitions for type-safe validation:
+
+```typescript
+// src/db/schema.ts
+import { pgTable, uuid, text, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+
+export const habits = pgTable('habits', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  // ... columns
+});
+
+// Export Zod schemas (single source of truth)
+export const insertHabitSchema = createInsertSchema(habits);
+export const selectHabitSchema = createSelectSchema(habits);
+
+// Export TypeScript types
+export type Habit = typeof habits.$inferSelect;
+export type NewHabit = typeof habits.$inferInsert;
+```
+
+Use in server functions:
+
+```typescript
+const createHabitFn = createServerFn({ method: 'POST' })
+  .validator((data: unknown) => insertHabitSchema.parse(data))
+  .handler(async ({ data }) => {
+    // data is fully typed and validated
+  });
+```
+
+### Runtime Assertions with Tiny Invariant
+
+Use `tiny-invariant` for cleaner runtime type assertions and error handling:
+
+```typescript
+import invariant from 'tiny-invariant';
+
+// Instead of:
+if (!user) throw new Error('User not found');
+
+// Use:
+invariant(user, 'User not found');
+// TypeScript now knows user is non-null below this line
+
+// Works great with database queries:
+const habit = await db.query.habits.findFirst({ where: eq(habits.id, id) });
+invariant(habit, 'Habit not found');
+// habit is now typed as non-null
+```
+
+Benefits:
+- ✅ Single source of truth for data types (Drizzle schema)
+- ✅ Automatic validation on server functions
+- ✅ Type safety between DB, server, and client
+- ✅ Cleaner runtime assertions and type narrowing

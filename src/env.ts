@@ -3,7 +3,11 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		DATABASE_URL: z.string(),
+		DATABASE_URL: z.url(),
+		BETTER_AUTH_SECRET: z.string().min(32),
+		BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
+		GOOGLE_CLIENT_ID: z.string(),
+		GOOGLE_CLIENT_SECRET: z.string(),
 	},
 
 	/**
@@ -18,7 +22,16 @@ export const env = createEnv({
 	 * What object holds the environment variables at runtime. This is usually
 	 * `process.env` or `import.meta.env`.
 	 */
-	runtimeEnv: import.meta.env,
+	runtimeEnv: {
+		// Server-side variables from process.env
+		DATABASE_URL: process.env.DATABASE_URL,
+		BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+		BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+		GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+		GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+		// Client-side variables from import.meta.env (with VITE_ prefix)
+		// Add any VITE_ prefixed variables here when needed
+	},
 
 	/**
 	 * By default, this library will feed the environment variables directly to
@@ -34,4 +47,9 @@ export const env = createEnv({
 	 * explicitly specify this option as true.
 	 */
 	emptyStringAsUndefined: true,
+
+	/**
+	 * Skip validation on client-side to avoid errors with server-only variables
+	 */
+	skipValidation: typeof window !== "undefined",
 });
