@@ -1,2 +1,3 @@
 pnpm format --write
 pnpm lint --write
+pnpm check --fix
