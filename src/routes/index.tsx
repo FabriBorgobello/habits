@@ -10,16 +10,45 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center px-4">
-			<div className="text-center space-y-6">
-				<h1 className="text-4xl font-semibold tracking-tight">Habits</h1>
+		<div className="min-h-screen flex flex-col">
+			{/* Header */}
+			<header className="flex items-center justify-between px-6 py-4">
+				<span className="text-lg font-semibold text-primary">Habits</span>
 				<Link
 					to="/sign-in"
-					className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
+					className="text-sm text-muted-foreground hover:text-foreground"
 				>
 					Sign in
 				</Link>
-			</div>
+			</header>
+
+			{/* Hero */}
+			<main className="flex-1 flex flex-col items-center justify-center px-6">
+				<div className="max-w-2xl text-center space-y-6">
+					<h1 className="text-5xl font-bold tracking-tight">
+						Build better habits,
+						<br />
+						<span className="text-primary">one day at a time</span>
+					</h1>
+					<p className="text-lg text-muted-foreground max-w-md mx-auto">
+						Track your daily habits, build streaks, and become the best version
+						of yourself.
+					</p>
+					<div className="pt-4">
+						<Link
+							to="/sign-in"
+							className="inline-flex h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-medium text-primary-foreground hover:bg-primary/90"
+						>
+							Get started
+						</Link>
+					</div>
+				</div>
+			</main>
+
+			{/* Footer */}
+			<footer className="px-6 py-4 text-center text-sm text-muted-foreground">
+				<p>Simple habit tracking for a better life.</p>
+			</footer>
 		</div>
 	);
 }

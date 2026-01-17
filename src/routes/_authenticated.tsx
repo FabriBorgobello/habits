@@ -24,25 +24,30 @@ function AuthenticatedLayout() {
 	};
 
 	return (
-		<div className="min-h-screen">
-			<header className="border-b">
-				<div className="container flex h-16 items-center justify-between px-4">
-					<Link to="/dashboard" className="font-semibold">
+		<div className="min-h-screen flex flex-col">
+			<header className="border-b border-border bg-card">
+				<div className="flex h-14 items-center justify-between px-6">
+					<Link to="/dashboard" className="text-lg font-semibold text-primary">
 						Habits
 					</Link>
 
 					<div className="flex items-center gap-4">
 						{user && (
-							<div className="flex items-center gap-2">
-								<span className="text-sm text-muted-foreground">
-									{user.name}
-								</span>
+							<div className="flex items-center gap-3">
+								{user.image && (
+									<img
+										src={user.image}
+										alt={user.name}
+										className="h-8 w-8 rounded-full"
+									/>
+								)}
+								<span className="text-sm text-foreground">{user.name}</span>
 							</div>
 						)}
 						<button
 							type="button"
 							onClick={handleSignOut}
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							className="text-sm text-muted-foreground hover:text-foreground"
 						>
 							Sign out
 						</button>
@@ -50,7 +55,7 @@ function AuthenticatedLayout() {
 				</div>
 			</header>
 
-			<main>
+			<main className="flex-1">
 				<Outlet />
 			</main>
 		</div>
