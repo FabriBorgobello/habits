@@ -57,6 +57,7 @@ function BetterAuthDemo() {
 					</div>
 
 					<button
+						type="button"
 						onClick={() => authClient.signOut()}
 						className="w-full h-9 px-4 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
 					>
@@ -104,7 +105,7 @@ function BetterAuthDemo() {
 					setError(result.error.message || "Sign in failed");
 				}
 			}
-		} catch (err) {
+		} catch (_err) {
 			setError("An unexpected error occurred");
 		} finally {
 			setLoading(false);

@@ -1,7 +1,7 @@
 import fs from "node:fs";
-import { useCallback, useState } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { useCallback, useState } from "react";
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -17,7 +17,12 @@ const loggedServerFunction = createServerFn({ method: "GET" }).middleware([
 
 const TODOS_FILE = "todos.json";
 
-async function readTodos() {
+type Todo = {
+	id: number;
+	name: string;
+};
+
+async function readTodos(): Promise<Todo[]> {
 	return JSON.parse(
 		await fs.promises.readFile(TODOS_FILE, "utf-8").catch(() =>
 			JSON.stringify(
@@ -52,6 +57,7 @@ export const Route = createFileRoute("/demo/start/server-funcs")({
 
 function Home() {
 	const router = useRouter();
+	const invalidate = router.invalidate;
 	let todos = Route.useLoaderData();
 
 	const [todo, setTodo] = useState("");
@@ -59,8 +65,8 @@ function Home() {
 	const submitTodo = useCallback(async () => {
 		todos = await addTodo({ data: todo });
 		setTodo("");
-		router.invalidate();
-	}, [addTodo, todo]);
+		invalidate();
+	}, [todo, invalidate, todos]);
 
 	return (
 		<div
@@ -96,6 +102,7 @@ function Home() {
 						className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
 					/>
 					<button
+						type="button"
 						disabled={todo.trim().length === 0}
 						onClick={submitTodo}
 						className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
