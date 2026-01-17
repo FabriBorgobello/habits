@@ -7,10 +7,12 @@ import {
 	Waves,
 	Zap,
 } from "lucide-react";
+import { env } from "@/env";
 
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
+	console.log(env);
 	const features = [
 		{
 			icon: <Zap className="w-12 h-12 text-cyan-400" />,
