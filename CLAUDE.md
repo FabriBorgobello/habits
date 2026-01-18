@@ -173,6 +173,8 @@ Both route loaders (built into TanStack Router) and TanStack Query are available
 - **Type-safe env**: T3 Env library in `src/env.ts`
 - **Client vars**: Must be prefixed with `VITE_`
 - **Files**: Load from `.env.local` or `.env`
+- **Retrieve**: `infisical export --env=prod --format=dotenv --output-file=.env.local` (change env accordingly).
+- **Set**: `infisical secrets set KEY=value --env=prod` (change env accordingly).
 
 ### UI & Styling
 
@@ -269,9 +271,3 @@ const habit = await db.query.habits.findFirst({ where: eq(habits.id, id) });
 invariant(habit, 'Habit not found');
 // habit is now typed as non-null
 ```
-
-Benefits:
-- ✅ Single source of truth for data types (Drizzle schema)
-- ✅ Automatic validation on server functions
-- ✅ Type safety between DB, server, and client
-- ✅ Cleaner runtime assertions and type narrowing
