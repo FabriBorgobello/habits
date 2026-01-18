@@ -78,6 +78,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
           await updateHabit.mutateAsync({ ...habitData, id: editingHabit.id });
         } else {
           await createHabit.mutateAsync(habitData);
+          form.reset();
         }
         onClose();
       } catch (error) {
