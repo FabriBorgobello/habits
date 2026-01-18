@@ -376,7 +376,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                           <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
                           <div className="min-w-0">
-                            <p className="text-white font-medium text-sm sm:text-base truncate">
+                            <p className="text-white font-medium text-sm sm:text-base truncate line-clamp-1">
                               {name || "Habit name"}
                             </p>
                             <p className="text-xs text-gray-400">

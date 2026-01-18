@@ -204,7 +204,7 @@ function HabitRow({ habit, completions, weekDays, index, reorderMode, onToggle, 
           <motion.span layout="position" className="text-lg sm:text-2xl shrink-0">
             {icon}
           </motion.span>
-          <motion.span layout="position" className="text-white font-medium text-sm sm:text-base truncate">
+          <motion.span layout="position" className="text-white font-medium text-sm sm:text-base truncate line-clamp-1">
             {habit.name}
           </motion.span>
         </motion.div>
