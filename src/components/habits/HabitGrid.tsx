@@ -1,5 +1,12 @@
+import { Archive, MoreVertical, Pencil } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Habit } from "@/db/schema";
 import { useToggleCompletion } from "@/hooks/use-habits";
 import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
@@ -13,9 +20,17 @@ interface HabitGridProps {
   weekDays: Date[];
   hideNonDueToday: boolean;
   onEditHabit: (habit: Habit) => void;
+  onArchiveHabit: (habit: Habit) => void;
 }
 
-export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEditHabit }: HabitGridProps) {
+export function HabitGrid({
+  habits,
+  completions,
+  weekDays,
+  hideNonDueToday,
+  onEditHabit,
+  onArchiveHabit,
+}: HabitGridProps) {
   const toggleCompletion = useToggleCompletion();
 
   // Filter habits based on hideNonDueToday
@@ -39,7 +54,7 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
   return (
     <div className="space-y-2">
       {/* Day headers */}
-      <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center pb-2 px-2 sm:px-4">
+      <div className="grid grid-cols-[1fr_auto_auto] gap-2 sm:gap-4 items-center pb-2 px-2 sm:px-4">
         <div />
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {weekDays.map((day) => (
@@ -54,6 +69,8 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
             </div>
           ))}
         </div>
+        {/* Spacer for menu column */}
+        <div className="w-7 sm:w-8" />
       </div>
 
       {/* Habit rows */}
@@ -78,6 +95,7 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
                 })
               }
               onEdit={() => onEditHabit(habit)}
+              onArchive={() => onArchiveHabit(habit)}
             />
           </motion.div>
         ))}
@@ -92,26 +110,23 @@ interface HabitRowProps {
   weekDays: Date[];
   onToggle: (date: string) => void;
   onEdit: () => void;
+  onArchive: () => void;
 }
 
-function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowProps) {
+function HabitRow({ habit, completions, weekDays, onToggle, onEdit, onArchive }: HabitRowProps) {
   const color = habit.colorHex || DEFAULT_COLOR;
   const icon = habit.icon || DEFAULT_ICON;
 
   return (
     <div
-      className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-950 rounded-2xl p-2 sm:p-4"
+      className="grid grid-cols-[1fr_auto_auto] gap-2 sm:gap-4 items-center bg-zinc-950 rounded-2xl p-2 sm:p-4"
       style={{ "--habit-color": color } as React.CSSProperties}
     >
       {/* Habit name */}
-      <button
-        type="button"
-        onClick={onEdit}
-        className="flex items-center gap-2 sm:gap-3 text-left hover:opacity-80 transition-opacity"
-      >
+      <div className="flex items-center gap-2 sm:gap-3">
         <span className="text-lg sm:text-2xl">{icon}</span>
         <span className="text-white font-medium text-sm sm:text-base">{habit.name}</span>
-      </button>
+      </div>
 
       {/* Completion squares */}
       <div className="grid grid-cols-7 gap-1 sm:gap-2">
@@ -137,13 +152,36 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
                   "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
                 !isDue && "opacity-30 cursor-not-allowed bg-zinc-800 border border-zinc-700",
                 isDue && !isCompleted && "bg-[color-mix(in_srgb,var(--habit-color)_20%,black)] hover:opacity-80",
-                isDue && isCompleted && "bg-[var(--habit-color)] hover:opacity-80",
+                isDue && isCompleted && "bg-(--habit-color) hover:opacity-80",
               )}
               aria-label={`${isCompleted ? "Unmark" : "Mark"} ${habit.name} as complete for ${dateStr}`}
             />
           );
         })}
       </div>
+
+      {/* Options menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
+            aria-label={`Options for ${habit.name}`}
+          >
+            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+          <DropdownMenuItem onClick={onEdit} className="text-white hover:bg-zinc-800 cursor-pointer">
+            <Pencil className="w-4 h-4" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onArchive} variant="destructive" className="cursor-pointer">
+            <Archive className="w-4 h-4" />
+            Archive
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

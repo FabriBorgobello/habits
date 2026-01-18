@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Habit } from "@/db/schema";
-import { useArchiveHabit, useCreateHabit, useUpdateHabit } from "@/hooks/use-habits";
+import { useCreateHabit, useUpdateHabit } from "@/hooks/use-habits";
 import { DEFAULT_COLOR, DEFAULT_ICON, HABIT_COLORS, HABIT_ICONS } from "@/lib/habit-constants";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +22,6 @@ const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
 export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   const createHabit = useCreateHabit();
   const updateHabit = useUpdateHabit();
-  const archiveHabit = useArchiveHabit();
 
   // Extract initial values from editing habit
   const getInitialFrequencyType = (): FrequencyType => {
@@ -86,16 +85,6 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
       }
     },
   });
-
-  const handleArchive = async () => {
-    if (!editingHabit) return;
-    try {
-      await archiveHabit.mutateAsync({ id: editingHabit.id });
-      onClose();
-    } catch (error) {
-      console.error("Failed to archive habit:", error);
-    }
-  };
 
   const getFrequencyText = (frequencyType: FrequencyType, weeklyCount: number, selectedDays: number[]) => {
     if (frequencyType === "daily") return "Every day";
@@ -434,17 +423,6 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                       >
                         Cancel
                       </Button>
-                      {editingHabit && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={handleArchive}
-                          disabled={archiveHabit.isPending}
-                          className="flex-1 text-sm sm:text-base text-red-400 hover:text-red-300 hover:bg-red-950"
-                        >
-                          Archive
-                        </Button>
-                      )}
                       <Button
                         type="submit"
                         disabled={!canSubmit || isSubmitting}

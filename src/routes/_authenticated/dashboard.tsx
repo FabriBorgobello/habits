@@ -7,7 +7,7 @@ import { WeekHeader } from "@/components/habits/WeekHeader";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { Habit } from "@/db/schema";
-import { useHabits } from "@/hooks/use-habits";
+import { useArchiveHabit, useHabits } from "@/hooks/use-habits";
 import { getCurrentWeekView, toDateString } from "@/lib/date-utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -26,6 +26,7 @@ function DashboardPage() {
 
   // Fetch habits and completions
   const { data, isLoading } = useHabits(startDateStr, endDateStr);
+  const archiveHabit = useArchiveHabit();
 
   const handleOpenModal = (habit?: Habit) => {
     setEditingHabit(habit || null);
@@ -35,6 +36,14 @@ function DashboardPage() {
   const handleCloseModal = () => {
     setModalOpen(false);
     setEditingHabit(null);
+  };
+
+  const handleArchiveHabit = async (habit: Habit) => {
+    try {
+      await archiveHabit.mutateAsync({ id: habit.id });
+    } catch (error) {
+      console.error("Failed to archive habit:", error);
+    }
   };
 
   return (
@@ -77,6 +86,7 @@ function DashboardPage() {
               weekDays={weekView.days}
               hideNonDueToday={hideNonDueToday}
               onEditHabit={handleOpenModal}
+              onArchiveHabit={handleArchiveHabit}
             />
           )}
         </div>
