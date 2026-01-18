@@ -24,8 +24,8 @@ function AuthenticatedLayout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] bg-card">
-      <header className="border-b border-border bg-card">
+    <div className="h-dvh flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] bg-card">
+      <header className="shrink-0 border-b border-border bg-card">
         <div className="flex h-14 items-center justify-end px-6">
           <div className="flex items-center gap-4">
             {user && (
@@ -45,7 +45,7 @@ function AuthenticatedLayout() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 min-h-0">
         <Outlet />
       </main>
     </div>
