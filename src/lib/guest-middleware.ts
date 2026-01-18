@@ -8,12 +8,12 @@ import { auth } from "@/lib/auth";
  * Redirects authenticated users to the dashboard.
  */
 export const guestMiddleware = createMiddleware().server(async ({ next }) => {
-	const headers = getRequestHeaders();
-	const session = await auth.api.getSession({ headers });
+  const headers = getRequestHeaders();
+  const session = await auth.api.getSession({ headers });
 
-	if (session) {
-		throw redirect({ to: "/dashboard" });
-	}
+  if (session) {
+    throw redirect({ to: "/dashboard" });
+  }
 
-	return await next();
+  return await next();
 });
