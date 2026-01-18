@@ -1,7 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { motion } from "motion/react";
 import { Drawer } from "vaul";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,16 +18,6 @@ interface HabitModalProps {
 type FrequencyType = "daily" | "weekly_count" | "specific_days";
 
 const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
-
-// Zod schema for form validation
-const habitFormSchema = z.object({
-  name: z.string().min(1, "Name is required").trim(),
-  colorHex: z.string(),
-  icon: z.string(),
-  frequencyType: z.enum(["daily", "weekly_count", "specific_days"]),
-  weeklyCount: z.number().int().min(1).max(7),
-  selectedDays: z.array(z.number().int().min(0).max(6)).min(1, "Select at least one day"),
-});
 
 export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   const createHabit = useCreateHabit();
@@ -68,9 +57,6 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
       frequencyType: getInitialFrequencyType(),
       weeklyCount: getInitialWeeklyCount(),
       selectedDays: getInitialSelectedDays(),
-    },
-    validators: {
-      onChange: habitFormSchema,
     },
     onSubmit: async ({ value }) => {
       const habitData = {
@@ -161,7 +147,12 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                 }}
               >
                 {/* Name */}
-                <form.Field name="name">
+                <form.Field
+                  name="name"
+                  validators={{
+                    onBlur: ({ value }) => (!value?.trim() ? "Name is required" : undefined),
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-2">
                       <Label htmlFor={field.name} className="text-xs uppercase text-gray-400">
@@ -175,7 +166,6 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="e.g. Morning yoga"
                         className="bg-zinc-950 border-zinc-800 text-white placeholder:text-gray-500"
-                        autoFocus
                       />
                       {field.state.meta.errors.length > 0 && (
                         <em className="text-xs text-red-400">{field.state.meta.errors.join(", ")}</em>
