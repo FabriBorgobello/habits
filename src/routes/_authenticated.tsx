@@ -33,7 +33,7 @@ function AuthenticatedLayout() {
   return (
     <div className="h-dvh flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] bg-card">
       <header className="shrink-0 border-b border-border bg-card">
-        <div className="flex h-14 items-center justify-end px-6">
+        <div className="flex h-14 items-center justify-end px-3 sm:px-6">
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

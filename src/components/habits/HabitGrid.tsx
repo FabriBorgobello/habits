@@ -99,7 +99,10 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
   const icon = habit.icon || DEFAULT_ICON;
 
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-950 rounded-2xl p-2 sm:p-4">
+    <div
+      className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-950 rounded-2xl p-2 sm:p-4"
+      style={{ "--habit-color": color } as React.CSSProperties}
+    >
       {/* Habit name */}
       <button
         type="button"
@@ -129,11 +132,11 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
               transition={{ duration: 0.15 }}
               className={cn(
                 "w-5 h-5 sm:w-10 sm:h-10 rounded-md transition-all",
-                isTodaySquare && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
-                !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80",
-                isCompleted ? "border-0" : "bg-zinc-800 border border-zinc-700",
+                isTodaySquare && isDue && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
+                !isDue && "opacity-30 cursor-not-allowed bg-zinc-800 border border-zinc-700",
+                isDue && !isCompleted && "bg-[color-mix(in_srgb,var(--habit-color)_20%,black)] hover:opacity-80",
+                isDue && isCompleted && "bg-[var(--habit-color)] hover:opacity-80",
               )}
-              style={isCompleted ? { backgroundColor: color } : undefined}
               aria-label={`${isCompleted ? "Unmark" : "Mark"} ${habit.name} as complete for ${dateStr}`}
             />
           );
