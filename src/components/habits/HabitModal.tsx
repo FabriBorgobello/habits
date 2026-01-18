@@ -174,7 +174,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="e.g. Morning yoga"
-                        className="bg-zinc-900 border-zinc-800 text-white placeholder:text-gray-500"
+                        className="bg-zinc-950 border-zinc-800 text-white placeholder:text-gray-500"
                         autoFocus
                       />
                       {field.state.meta.errors.length > 0 && (
@@ -239,7 +239,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                               "mx-auto w-full min-w-12 sm:min-w-14 h-12 sm:h-14 text-xl sm:text-2xl rounded-xl transition-all",
                               field.state.value === emoji
                                 ? "bg-zinc-700 ring-2 ring-white"
-                                : "bg-zinc-900 hover:bg-zinc-800",
+                                : "bg-zinc-950 hover:bg-zinc-800",
                             )}
                             aria-label={`Select ${emoji} icon`}
                           >
@@ -273,7 +273,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                             "w-full text-left px-4 py-3 rounded-lg transition-colors",
                             frequencyField.state.value === "daily"
                               ? "bg-zinc-700 text-white"
-                              : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
+                              : "bg-zinc-950 text-gray-400 hover:bg-zinc-800",
                           )}
                         >
                           Every day
@@ -288,7 +288,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                               "w-full text-left px-4 py-3 rounded-lg transition-colors",
                               frequencyField.state.value === "weekly_count"
                                 ? "bg-zinc-700 text-white"
-                                : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
+                                : "bg-zinc-950 text-gray-400 hover:bg-zinc-800",
                             )}
                           >
                             X times per week
@@ -303,7 +303,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                                     max={7}
                                     value={countField.state.value}
                                     onChange={(e) => countField.handleChange(Number(e.target.value))}
-                                    className="w-full bg-zinc-900 border-zinc-800 text-white"
+                                    className="w-full bg-zinc-950 border-zinc-800 text-white"
                                   />
                                   {countField.state.meta.errors.length > 0 && (
                                     <em className="text-xs text-red-400">{countField.state.meta.errors.join(", ")}</em>
@@ -323,7 +323,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                               "w-full text-left px-4 py-3 rounded-lg transition-colors",
                               frequencyField.state.value === "specific_days"
                                 ? "bg-zinc-700 text-white"
-                                : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
+                                : "bg-zinc-950 text-gray-400 hover:bg-zinc-800",
                             )}
                           >
                             Specific days
@@ -348,7 +348,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                                           "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base rounded-lg transition-colors",
                                           daysField.state.value.includes(index)
                                             ? "bg-white text-black"
-                                            : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
+                                            : "bg-zinc-950 text-gray-400 hover:bg-zinc-800",
                                         )}
                                       >
                                         {day}
@@ -389,7 +389,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {({ name, icon, colorHex, frequencyType, weeklyCount, selectedDays }) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Preview</Label>
-                      <div className="bg-zinc-900 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2">
+                      <div className="bg-zinc-950 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                           <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
                           <div className="min-w-0">
@@ -436,7 +436,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         type="button"
                         variant="ghost"
                         onClick={onClose}
-                        className="flex-1 text-sm sm:text-base text-gray-400 hover:text-white hover:bg-zinc-900"
+                        className="flex-1 text-sm sm:text-base text-gray-400 hover:text-white hover:bg-zinc-950"
                       >
                         Cancel
                       </Button>

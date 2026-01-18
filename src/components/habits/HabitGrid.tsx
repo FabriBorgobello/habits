@@ -45,7 +45,10 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
           {weekDays.map((day) => (
             <div
               key={day.toISOString()}
-              className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-400 w-6 sm:w-10"
+              className={cn(
+                "shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-400 w-5 sm:w-10",
+                isToday(day) && "text-white",
+              )}
             >
               {getDayAbbreviation(day)}
             </div>
@@ -96,7 +99,7 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
   const icon = habit.icon || DEFAULT_ICON;
 
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-900 rounded-2xl p-2 sm:p-4">
+    <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-950 rounded-2xl p-2 sm:p-4">
       {/* Habit name */}
       <button
         type="button"
@@ -125,7 +128,7 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
               whileHover={isDue ? { scale: 1.05 } : {}}
               transition={{ duration: 0.15 }}
               className={cn(
-                "w-6 h-6 sm:w-10 sm:h-10 rounded-md transition-all",
+                "w-5 h-5 sm:w-10 sm:h-10 rounded-md transition-all",
                 isTodaySquare && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
                 !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80",
                 isCompleted ? "border-0" : "bg-zinc-800 border border-zinc-700",

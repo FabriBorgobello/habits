@@ -1,6 +1,13 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { authMiddleware } from "@/lib/auth-middleware";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
@@ -27,21 +34,34 @@ function AuthenticatedLayout() {
     <div className="h-dvh flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] bg-card">
       <header className="shrink-0 border-b border-border bg-card">
         <div className="flex h-14 items-center justify-end px-6">
-          <div className="flex items-center gap-4">
-            {user && (
-              <div className="flex items-center gap-3">
-                {user.image && <img src={user.image} alt={user.name} className="h-8 w-8 rounded-full" />}
-                <span className="text-sm text-foreground hidden sm:block">{user.name}</span>
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Sign out
-            </button>
-          </div>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="h-8 w-8 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                >
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name || "Profile"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </header>
 
