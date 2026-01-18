@@ -129,9 +129,9 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
         <Drawer.Content className="bg-zinc-950 flex flex-col rounded-t-3xl h-[96%] mt-24 fixed bottom-0 left-0 right-0">
-          <div className="p-4 bg-zinc-950 rounded-t-3xl flex-1 overflow-auto">
-            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-700 mb-8" />
-            <Drawer.Title className="text-white text-xl font-semibold mb-6">
+          <div className="px-4 py-4 sm:p-6 bg-zinc-950 rounded-t-3xl flex-1 overflow-auto">
+            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-700 mb-4 sm:mb-8" />
+            <Drawer.Title className="text-white text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
               {editingHabit ? "Edit Habit" : "New Habit"}
             </Drawer.Title>
 
@@ -141,7 +141,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                 e.stopPropagation();
                 form.handleSubmit();
               }}
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6"
               initial="hidden"
               animate="visible"
               variants={{
@@ -196,14 +196,14 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {(field) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Color</Label>
-                      <div className="flex gap-3">
+                      <div className="flex gap-2 sm:gap-3">
                         {HABIT_COLORS.map((color) => (
                           <button
                             key={color.value}
                             type="button"
                             onClick={() => field.handleChange(color.value)}
                             className={cn(
-                              "w-12 h-12 rounded-full transition-all",
+                              "w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all",
                               field.state.value === color.value
                                 ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-950"
                                 : "hover:scale-110",
@@ -229,14 +229,14 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {(field) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Icon</Label>
-                      <div className="grid grid-cols-5 gap-2 justify-center">
+                      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 justify-center">
                         {HABIT_ICONS.map((emoji) => (
                           <button
                             key={emoji}
                             type="button"
                             onClick={() => field.handleChange(emoji)}
                             className={cn(
-                              "mx-auto w-full min-w-14 h-14 text-2xl rounded-xl transition-all",
+                              "mx-auto w-full min-w-12 sm:min-w-14 h-12 sm:h-14 text-xl sm:text-2xl rounded-xl transition-all",
                               field.state.value === emoji
                                 ? "bg-zinc-700 ring-2 ring-white"
                                 : "bg-zinc-900 hover:bg-zinc-800",
@@ -331,8 +331,8 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                           {frequencyField.state.value === "specific_days" && (
                             <form.Field name="selectedDays">
                               {(daysField) => (
-                                <div className="mt-2 ml-4">
-                                  <div className="flex gap-2">
+                                <div className="mt-2 ml-2 sm:ml-4">
+                                  <div className="flex gap-1.5 sm:gap-2">
                                     {DAY_NAMES.map((day, index) => (
                                       <button
                                         key={index}
@@ -345,7 +345,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                                           daysField.handleChange(updated);
                                         }}
                                         className={cn(
-                                          "w-10 h-10 rounded-lg transition-colors",
+                                          "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base rounded-lg transition-colors",
                                           daysField.state.value.includes(index)
                                             ? "bg-white text-black"
                                             : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
@@ -389,27 +389,27 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {({ name, icon, colorHex, frequencyType, weeklyCount, selectedDays }) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Preview</Label>
-                      <div className="bg-zinc-900 rounded-2xl p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{icon}</span>
-                          <div>
-                            <p className="text-white font-medium">{name || "Habit name"}</p>
+                      <div className="bg-zinc-900 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                          <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
+                          <div className="min-w-0">
+                            <p className="text-white font-medium text-sm sm:text-base truncate">{name || "Habit name"}</p>
                             <p className="text-xs text-gray-400">
                               {getFrequencyText(frequencyType, weeklyCount, selectedDays)}
                             </p>
                           </div>
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex gap-0.5 sm:gap-1 shrink-0">
                           {[...Array(7)].map((_, i) => {
-                            const isFirst = i < 4;
+                            const isCompleted = i < 4;
                             return (
                               <div
                                 key={i}
-                                className="w-6 h-6 rounded"
-                                style={{
-                                  backgroundColor: isFirst ? colorHex : "#27272a",
-                                  border: isFirst ? "none" : "1px solid #3f3f46",
-                                }}
+                                className={cn(
+                                  "w-4 h-4 sm:w-6 sm:h-6 rounded",
+                                  isCompleted ? "border-0" : "bg-zinc-800 border border-zinc-700",
+                                )}
+                                style={isCompleted ? { backgroundColor: colorHex } : undefined}
                               />
                             );
                           })}
@@ -429,12 +429,12 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                 {/* Actions */}
                 <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
                   {([canSubmit, isSubmitting]) => (
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
                       <Button
                         type="button"
                         variant="ghost"
                         onClick={onClose}
-                        className="flex-1 text-gray-400 hover:text-white hover:bg-zinc-900"
+                        className="flex-1 text-sm sm:text-base text-gray-400 hover:text-white hover:bg-zinc-900"
                       >
                         Cancel
                       </Button>
@@ -444,7 +444,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                           variant="ghost"
                           onClick={handleArchive}
                           disabled={archiveHabit.isPending}
-                          className="flex-1 text-red-400 hover:text-red-300 hover:bg-red-950"
+                          className="flex-1 text-sm sm:text-base text-red-400 hover:text-red-300 hover:bg-red-950"
                         >
                           Archive
                         </Button>
@@ -452,7 +452,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                       <Button
                         type="submit"
                         disabled={!canSubmit || isSubmitting}
-                        className="flex-1 bg-white text-black hover:bg-gray-200"
+                        className="flex-1 text-sm sm:text-base bg-white text-black hover:bg-gray-200"
                       >
                         {editingHabit ? "Save" : "Add"}
                       </Button>

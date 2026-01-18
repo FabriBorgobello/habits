@@ -37,7 +37,7 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Day headers */}
       <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center pb-2 px-2 sm:px-4">
         <div />
@@ -45,7 +45,7 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
           {weekDays.map((day) => (
             <div
               key={day.toISOString()}
-              className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-400 w-7 sm:w-10"
+              className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-400 w-6 sm:w-10"
             >
               {getDayAbbreviation(day)}
             </div>
@@ -125,14 +125,12 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
               whileHover={isDue ? { scale: 1.05 } : {}}
               transition={{ duration: 0.15 }}
               className={cn(
-                "w-7 h-7 sm:w-10 sm:h-10 rounded-lg transition-all",
+                "w-6 h-6 sm:w-10 sm:h-10 rounded-md transition-all",
                 isTodaySquare && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
                 !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80",
+                isCompleted ? "border-0" : "bg-zinc-800 border border-zinc-700",
               )}
-              style={{
-                backgroundColor: isCompleted ? color : "#27272a",
-                border: isCompleted ? "none" : "1px solid #3f3f46",
-              }}
+              style={isCompleted ? { backgroundColor: color } : undefined}
               aria-label={`${isCompleted ? "Unmark" : "Mark"} ${habit.name} as complete for ${dateStr}`}
             />
           );
