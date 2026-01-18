@@ -1,13 +1,13 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
-import { authMiddleware } from "@/lib/auth-middleware";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { authClient } from "@/lib/auth-client";
+import { authMiddleware } from "@/lib/auth-middleware";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
@@ -42,11 +42,7 @@ function AuthenticatedLayout() {
                   className="h-8 w-8 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 >
                   {user.image ? (
-                    <img
-                      src={user.image}
-                      alt={user.name || "Profile"}
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={user.image} alt={user.name || "Profile"} className="h-full w-full object-cover" />
                   ) : (
                     <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
                       {user.name?.charAt(0)?.toUpperCase() || "U"}
