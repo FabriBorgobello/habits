@@ -1,13 +1,33 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
+import { createRootRouteWithContext, HeadContent, Link, Scripts } from "@tanstack/react-router";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
+
+function NotFound() {
+  return (
+    <div className="grid min-h-svh place-items-center bg-background text-foreground">
+      <div className="text-center">
+        <p className="text-8xl font-bold text-primary">404</p>
+        <p className="mt-4 text-lg text-muted-foreground">Page not found</p>
+        <Button asChild className="mt-6">
+          <Link to="/">
+            <ChevronLeft />
+            Back to home
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 interface MyRouterContext {
   queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  notFoundComponent: NotFound,
   head: () => ({
     meta: [
       {

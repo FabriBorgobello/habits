@@ -43,11 +43,16 @@ export function HabitGrid({
 
   if (visibleHabits.length === 0) {
     return (
-      <div className="text-center py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="text-center py-12"
+      >
         <p className="text-gray-400 text-lg">
           {hideNonDueToday ? "No habits due today" : "No habits yet. Create your first habit!"}
         </p>
-      </div>
+      </motion.div>
     );
   }
 

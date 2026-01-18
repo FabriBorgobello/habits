@@ -1,14 +1,14 @@
 // Habits PWA Service Worker
-const CACHE_NAME = "habits-v1";
+const CACHE_NAME = "habits-v2";
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
-  "/favicon.ico?v=1",
-  "/favicon-16x16.png?v=1",
-  "/favicon-32x32.png?v=1",
-  "/apple-touch-icon.png?v=1",
-  "/android-chrome-192x192.png?v=1",
-  "/android-chrome-512x512.png?v=1",
+  "/favicon.ico?v=2",
+  "/favicon-16x16.png?v=2",
+  "/favicon-32x32.png?v=2",
+  "/apple-touch-icon.png?v=2",
+  "/android-chrome-192x192.png?v=2",
+  "/android-chrome-512x512.png?v=2",
 ];
 
 // Install: cache static assets
