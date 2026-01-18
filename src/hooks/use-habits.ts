@@ -6,6 +6,7 @@ import {
   archiveHabitFn,
   createHabitFn,
   getHabitsWithCompletionsFn,
+  reorderHabitsFn,
   toggleHabitCompletionFn,
   updateHabitFn,
 } from "@/server/habits";
@@ -129,6 +130,52 @@ export function useArchiveHabit() {
     onError: (error) => {
       console.error("Failed to archive habit:", error);
       toast.error("Failed to archive habit");
+    },
+  });
+}
+
+/**
+ * Reorder habits
+ */
+export function useReorderHabits() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (orderedIds: string[]) => reorderHabitsFn({ data: { orderedIds } }),
+    onMutate: async (orderedIds) => {
+      // Cancel outgoing queries
+      await queryClient.cancelQueries({ queryKey: ["habits"] });
+
+      // Snapshot previous data
+      const previousData = queryClient.getQueriesData({ queryKey: ["habits"] });
+
+      // Optimistically update
+      queryClient.setQueriesData({ queryKey: ["habits"] }, (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+
+        const typedOld = old as { habits: Array<{ id: string }>; completions: Record<string, string[]> };
+        const orderedHabits = orderedIds
+          .map((id) => typedOld.habits.find((h) => h.id === id))
+          .filter(Boolean);
+
+        return { ...typedOld, habits: orderedHabits };
+      });
+
+      return { previousData };
+    },
+    onError: (error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        for (const [queryKey, data] of context.previousData) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      console.error("Failed to reorder habits:", error);
+      toast.error("Failed to reorder habits");
+    },
+    onSettled: () => {
+      // Refetch to sync with server
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
     },
   });
 }

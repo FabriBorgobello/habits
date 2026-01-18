@@ -35,7 +35,7 @@ export const getHabitsWithCompletionsFn = createServerFn({ method: "GET" })
     // Fetch user's non-archived habits
     const userHabits = await db.query.habits.findMany({
       where: and(eq(habits.userId, user.id), eq(habits.isArchived, false)),
-      orderBy: (habits, { desc }) => [desc(habits.createdAt)],
+      orderBy: (habits, { asc }) => [asc(habits.sortOrder), asc(habits.createdAt)],
     });
 
     if (userHabits.length === 0) {
@@ -168,6 +168,43 @@ export const toggleHabitCompletionFn = createServerFn({ method: "POST" })
     });
 
     return { completed: true };
+  });
+
+/**
+ * Reorder habits
+ */
+export const reorderHabitsFn = createServerFn({ method: "POST" })
+  .inputValidator((data) =>
+    z
+      .object({
+        orderedIds: z.array(z.string().uuid()),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const user = await requireUser();
+
+    // Verify all habits belong to the user
+    const userHabits = await db.query.habits.findMany({
+      where: and(eq(habits.userId, user.id), eq(habits.isArchived, false)),
+    });
+
+    const userHabitIds = new Set(userHabits.map((h) => h.id));
+    const allBelongToUser = data.orderedIds.every((id) => userHabitIds.has(id));
+
+    invariant(allBelongToUser, "Some habits not found or unauthorized");
+
+    // Update sort order for each habit
+    await Promise.all(
+      data.orderedIds.map((id, index) =>
+        db
+          .update(habits)
+          .set({ sortOrder: index, updatedAt: new Date() })
+          .where(eq(habits.id, id)),
+      ),
+    );
+
+    return { success: true };
   });
 
 /**

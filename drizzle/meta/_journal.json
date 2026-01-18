@@ -15,6 +15,13 @@
       "when": 1768734384736,
       "tag": "0001_slimy_king_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768744479674,
+      "tag": "0002_broad_korath",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { ArrowUpDown, Check, Plus } from "lucide-react";
 import { useState } from "react";
 import { HabitGrid } from "@/components/habits/HabitGrid";
 import { HabitModal } from "@/components/habits/HabitModal";
@@ -18,6 +18,7 @@ function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [hideNonDueToday, setHideNonDueToday] = useState(false);
+  const [reorderMode, setReorderMode] = useState(false);
 
   // Get current week view
   const weekView = getCurrentWeekView();
@@ -64,12 +65,37 @@ function DashboardPage() {
             </button>
           </div>
 
-          {/* Hide filter toggle */}
-          <div className="flex items-center space-x-2">
-            <Switch id="hide-filter" checked={hideNonDueToday} onCheckedChange={setHideNonDueToday} />
-            <Label htmlFor="hide-filter" className="text-gray-400 text-xs sm:text-sm cursor-pointer">
-              Hide habits not due today
-            </Label>
+          {/* Controls row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch id="hide-filter" checked={hideNonDueToday} onCheckedChange={setHideNonDueToday} />
+              <Label htmlFor="hide-filter" className="text-gray-400 text-xs sm:text-sm cursor-pointer">
+                Hide habits not due today
+              </Label>
+            </div>
+
+            {/* Reorder mode toggle */}
+            <button
+              type="button"
+              onClick={() => setReorderMode(!reorderMode)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                reorderMode
+                  ? "bg-white text-black"
+                  : "bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700"
+              }`}
+            >
+              {reorderMode ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  Done
+                </>
+              ) : (
+                <>
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  Reorder
+                </>
+              )}
+            </button>
           </div>
         </div>
 
@@ -85,6 +111,7 @@ function DashboardPage() {
               completions={data?.completions || {}}
               weekDays={weekView.days}
               hideNonDueToday={hideNonDueToday}
+              reorderMode={reorderMode}
               onEditHabit={handleOpenModal}
               onArchiveHabit={handleArchiveHabit}
             />

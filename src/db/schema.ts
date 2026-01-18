@@ -1,4 +1,4 @@
-import { boolean, date, jsonb, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import { boolean, date, integer, jsonb, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -93,6 +93,7 @@ export const habits = pgTable("habits", {
     .notNull()
     .default("daily"),
   frequencyConfig: jsonb("frequency_config").$type<FrequencyConfigType>(),
+  sortOrder: integer("sort_order").notNull().default(0),
   isArchived: boolean("is_archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
