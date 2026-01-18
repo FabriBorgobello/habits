@@ -107,9 +107,6 @@ export function useToggleCompletion() {
       console.error("Failed to toggle completion:", error);
       toast.error("Failed to update completion");
     },
-    onSuccess: (result, { habitName }) => {
-      toast.success(result.completed ? `Completed ${habitName}` : `Removed completion for ${habitName}`);
-    },
     onSettled: () => {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ["habits"] });

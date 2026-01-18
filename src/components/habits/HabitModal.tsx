@@ -1,12 +1,14 @@
 import { useForm } from "@tanstack/react-form";
+import { motion } from "motion/react";
+import { Drawer } from "vaul";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Habit } from "@/db/schema";
 import { useArchiveHabit, useCreateHabit, useUpdateHabit } from "@/hooks/use-habits";
 import { DEFAULT_COLOR, DEFAULT_ICON, HABIT_COLORS, HABIT_ICONS } from "@/lib/habit-constants";
+import { cn } from "@/lib/utils";
 
 interface HabitModalProps {
   open: boolean;
@@ -53,9 +55,9 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   };
 
   const getInitialSelectedDays = (): number[] => {
-    if (!editingHabit?.frequencyConfig) return [1, 3, 5];
+    if (!editingHabit?.frequencyConfig) return [new Date().getDay()];
     const config = editingHabit.frequencyConfig as { type: string; days?: number[] };
-    return config.type === "specific_days" && config.days ? config.days : [1, 3, 5];
+    return config.type === "specific_days" && config.days ? config.days : [new Date().getDay()];
   };
 
   const form = useForm({
@@ -115,279 +117,353 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
     return `${selectedDays.length} days per week`;
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose();
+      setTimeout(() => form.reset(), 200);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="bg-zinc-950 border-zinc-800 text-white sm:max-w-125">
-        <DialogHeader>
-          <DialogTitle className="text-white text-xl">{editingHabit ? "Edit Habit" : "New Habit"}</DialogTitle>
-        </DialogHeader>
+    <Drawer.Root open={open} onOpenChange={handleOpenChange}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+        <Drawer.Content className="bg-zinc-950 flex flex-col rounded-t-3xl h-[96%] mt-24 fixed bottom-0 left-0 right-0">
+          <div className="p-4 bg-zinc-950 rounded-t-3xl flex-1 overflow-auto">
+            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-700 mb-8" />
+            <Drawer.Title className="text-white text-xl font-semibold mb-6">
+              {editingHabit ? "Edit Habit" : "New Habit"}
+            </Drawer.Title>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          className="space-y-6"
-        >
-          {/* Name */}
-          <form.Field name="name">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-xs uppercase text-gray-400">
-                  Name
-                </Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="e.g. Morning yoga"
-                  className="bg-zinc-900 border-zinc-800 text-white placeholder:text-gray-500"
-                  autoFocus
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <em className="text-xs text-red-400">{field.state.meta.errors.join(", ")}</em>
-                )}
-              </div>
-            )}
-          </form.Field>
-
-          {/* Color */}
-          <form.Field name="colorHex">
-            {(field) => (
-              <div className="space-y-2">
-                <Label className="text-xs uppercase text-gray-400">Color</Label>
-                <div className="flex gap-3">
-                  {HABIT_COLORS.map((color) => (
-                    <button
-                      key={color.value}
-                      type="button"
-                      onClick={() => field.handleChange(color.value)}
-                      className={`w-12 h-12 rounded-full transition-all ${
-                        field.state.value === color.value
-                          ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-950"
-                          : "hover:scale-110"
-                      }`}
-                      style={{ backgroundColor: color.value }}
-                      aria-label={`Select ${color.name} color`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </form.Field>
-
-          {/* Icon */}
-          <form.Field name="icon">
-            {(field) => (
-              <div className="space-y-2">
-                <Label className="text-xs uppercase text-gray-400">Icon</Label>
-                <div className="grid grid-cols-5 gap-2">
-                  {HABIT_ICONS.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => field.handleChange(emoji)}
-                      className={`w-14 h-14 text-2xl rounded-xl transition-all ${
-                        field.state.value === emoji ? "bg-zinc-700 ring-2 ring-white" : "bg-zinc-900 hover:bg-zinc-800"
-                      }`}
-                      aria-label={`Select ${emoji} icon`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </form.Field>
-
-          {/* Frequency */}
-          <form.Field name="frequencyType">
-            {(frequencyField) => (
-              <div className="space-y-3">
-                <Label className="text-xs uppercase text-gray-400">Frequency</Label>
-
-                <div className="space-y-2">
-                  {/* Daily */}
-                  <button
-                    type="button"
-                    onClick={() => frequencyField.handleChange("daily")}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                      frequencyField.state.value === "daily"
-                        ? "bg-zinc-700 text-white"
-                        : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
-                    }`}
-                  >
-                    Every day
-                  </button>
-
-                  {/* Weekly Count */}
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => frequencyField.handleChange("weekly_count")}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                        frequencyField.state.value === "weekly_count"
-                          ? "bg-zinc-700 text-white"
-                          : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
-                      }`}
-                    >
-                      X times per week
-                    </button>
-                    {frequencyField.state.value === "weekly_count" && (
-                      <form.Field name="weeklyCount">
-                        {(countField) => (
-                          <div className="mt-2 ml-4">
-                            <Input
-                              type="number"
-                              min={1}
-                              max={7}
-                              value={countField.state.value}
-                              onChange={(e) => countField.handleChange(Number(e.target.value))}
-                              className="w-24 bg-zinc-900 border-zinc-800 text-white"
-                            />
-                            {countField.state.meta.errors.length > 0 && (
-                              <em className="text-xs text-red-400">{countField.state.meta.errors.join(", ")}</em>
-                            )}
-                          </div>
-                        )}
-                      </form.Field>
-                    )}
-                  </div>
-
-                  {/* Specific Days */}
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => frequencyField.handleChange("specific_days")}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                        frequencyField.state.value === "specific_days"
-                          ? "bg-zinc-700 text-white"
-                          : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
-                      }`}
-                    >
-                      Specific days
-                    </button>
-                    {frequencyField.state.value === "specific_days" && (
-                      <form.Field name="selectedDays">
-                        {(daysField) => (
-                          <div className="mt-2 ml-4">
-                            <div className="flex gap-2">
-                              {DAY_NAMES.map((day, index) => (
-                                <button
-                                  key={index}
-                                  type="button"
-                                  onClick={() => {
-                                    const current = daysField.state.value;
-                                    const updated = current.includes(index)
-                                      ? current.filter((d) => d !== index)
-                                      : [...current, index].sort();
-                                    daysField.handleChange(updated);
-                                  }}
-                                  className={`w-10 h-10 rounded-lg transition-colors ${
-                                    daysField.state.value.includes(index)
-                                      ? "bg-white text-black"
-                                      : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
-                                  }`}
-                                >
-                                  {day}
-                                </button>
-                              ))}
-                            </div>
-                            {daysField.state.meta.errors.length > 0 && (
-                              <em className="text-xs text-red-400">{daysField.state.meta.errors.join(", ")}</em>
-                            )}
-                          </div>
-                        )}
-                      </form.Field>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </form.Field>
-
-          {/* Preview */}
-          <form.Subscribe
-            selector={(state) => ({
-              name: state.values.name,
-              icon: state.values.icon,
-              colorHex: state.values.colorHex,
-              frequencyType: state.values.frequencyType,
-              weeklyCount: state.values.weeklyCount,
-              selectedDays: state.values.selectedDays,
-            })}
-          >
-            {({ name, icon, colorHex, frequencyType, weeklyCount, selectedDays }) => (
-              <div className="space-y-2">
-                <Label className="text-xs uppercase text-gray-400">Preview</Label>
-                <div className="bg-zinc-900 rounded-2xl p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{icon}</span>
-                    <div>
-                      <p className="text-white font-medium">{name || "Habit name"}</p>
-                      <p className="text-xs text-gray-400">
-                        {getFrequencyText(frequencyType, weeklyCount, selectedDays)}
-                      </p>
+            <motion.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}
+              className="space-y-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.05,
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Name */}
+                <form.Field name="name">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name} className="text-xs uppercase text-gray-400">
+                        Name
+                      </Label>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="e.g. Morning yoga"
+                        className="bg-zinc-900 border-zinc-800 text-white placeholder:text-gray-500"
+                        autoFocus
+                      />
+                      {field.state.meta.errors.length > 0 && (
+                        <em className="text-xs text-red-400">{field.state.meta.errors.join(", ")}</em>
+                      )}
                     </div>
-                  </div>
-                  <div className="flex gap-1">
-                    {[...Array(7)].map((_, i) => {
-                      const isFirst = i < 4;
-                      return (
-                        <div
-                          key={i}
-                          className="w-6 h-6 rounded"
-                          style={{
-                            backgroundColor: isFirst ? colorHex : "#27272a",
-                            border: isFirst ? "none" : "1px solid #3f3f46",
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-          </form.Subscribe>
+                  )}
+                </form.Field>
+              </motion.div>
 
-          {/* Actions */}
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={onClose}
-                  className="flex-1 text-gray-400 hover:text-white hover:bg-zinc-900"
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Color */}
+                <form.Field name="colorHex">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-gray-400">Color</Label>
+                      <div className="flex gap-3">
+                        {HABIT_COLORS.map((color) => (
+                          <button
+                            key={color.value}
+                            type="button"
+                            onClick={() => field.handleChange(color.value)}
+                            className={cn(
+                              "w-12 h-12 rounded-full transition-all",
+                              field.state.value === color.value
+                                ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-950"
+                                : "hover:scale-110"
+                            )}
+                            style={{ backgroundColor: color.value }}
+                            aria-label={`Select ${color.name} color`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+              </motion.div>
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Icon */}
+                <form.Field name="icon">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-gray-400">Icon</Label>
+                      <div className="grid grid-cols-5 gap-2 justify-center">
+                        {HABIT_ICONS.map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => field.handleChange(emoji)}
+                            className={cn(
+                              "mx-auto w-full min-w-14 h-14 text-2xl rounded-xl transition-all",
+                              field.state.value === emoji
+                                ? "bg-zinc-700 ring-2 ring-white"
+                                : "bg-zinc-900 hover:bg-zinc-800"
+                            )}
+                            aria-label={`Select ${emoji} icon`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+              </motion.div>
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Frequency */}
+                <form.Field name="frequencyType">
+                  {(frequencyField) => (
+                    <div className="space-y-3">
+                      <Label className="text-xs uppercase text-gray-400">Frequency</Label>
+
+                      <div className="space-y-2">
+                        {/* Daily */}
+                        <button
+                          type="button"
+                          onClick={() => frequencyField.handleChange("daily")}
+                          className={cn(
+                            "w-full text-left px-4 py-3 rounded-lg transition-colors",
+                            frequencyField.state.value === "daily"
+                              ? "bg-zinc-700 text-white"
+                              : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
+                          )}
+                        >
+                          Every day
+                        </button>
+
+                        {/* Weekly Count */}
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => frequencyField.handleChange("weekly_count")}
+                            className={cn(
+                              "w-full text-left px-4 py-3 rounded-lg transition-colors",
+                              frequencyField.state.value === "weekly_count"
+                                ? "bg-zinc-700 text-white"
+                                : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
+                            )}
+                          >
+                            X times per week
+                          </button>
+                          {frequencyField.state.value === "weekly_count" && (
+                            <form.Field name="weeklyCount">
+                              {(countField) => (
+                                <div className="mt-2 ml-4">
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    max={7}
+                                    value={countField.state.value}
+                                    onChange={(e) => countField.handleChange(Number(e.target.value))}
+                                    className="w-full bg-zinc-900 border-zinc-800 text-white"
+                                  />
+                                  {countField.state.meta.errors.length > 0 && (
+                                    <em className="text-xs text-red-400">{countField.state.meta.errors.join(", ")}</em>
+                                  )}
+                                </div>
+                              )}
+                            </form.Field>
+                          )}
+                        </div>
+
+                        {/* Specific Days */}
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => frequencyField.handleChange("specific_days")}
+                            className={cn(
+                              "w-full text-left px-4 py-3 rounded-lg transition-colors",
+                              frequencyField.state.value === "specific_days"
+                                ? "bg-zinc-700 text-white"
+                                : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
+                            )}
+                          >
+                            Specific days
+                          </button>
+                          {frequencyField.state.value === "specific_days" && (
+                            <form.Field name="selectedDays">
+                              {(daysField) => (
+                                <div className="mt-2 ml-4">
+                                  <div className="flex gap-2">
+                                    {DAY_NAMES.map((day, index) => (
+                                      <button
+                                        key={index}
+                                        type="button"
+                                        onClick={() => {
+                                          const current = daysField.state.value;
+                                          const updated = current.includes(index)
+                                            ? current.filter((d) => d !== index)
+                                            : [...current, index].sort();
+                                          daysField.handleChange(updated);
+                                        }}
+                                        className={cn(
+                                          "w-10 h-10 rounded-lg transition-colors",
+                                          daysField.state.value.includes(index)
+                                            ? "bg-white text-black"
+                                            : "bg-zinc-900 text-gray-400 hover:bg-zinc-800"
+                                        )}
+                                      >
+                                        {day}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  {daysField.state.meta.errors.length > 0 && (
+                                    <em className="text-xs text-red-400">{daysField.state.meta.errors.join(", ")}</em>
+                                  )}
+                                </div>
+                              )}
+                            </form.Field>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+              </motion.div>
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Preview */}
+                <form.Subscribe
+                  selector={(state) => ({
+                    name: state.values.name,
+                    icon: state.values.icon,
+                    colorHex: state.values.colorHex,
+                    frequencyType: state.values.frequencyType,
+                    weeklyCount: state.values.weeklyCount,
+                    selectedDays: state.values.selectedDays,
+                  })}
                 >
-                  Cancel
-                </Button>
-                {editingHabit && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={handleArchive}
-                    disabled={archiveHabit.isPending}
-                    className="flex-1 text-red-400 hover:text-red-300 hover:bg-red-950"
-                  >
-                    Archive
-                  </Button>
-                )}
-                <Button
-                  type="submit"
-                  disabled={!canSubmit || isSubmitting}
-                  className="flex-1 bg-white text-black hover:bg-gray-200"
-                >
-                  {editingHabit ? "Save" : "Add"}
-                </Button>
-              </div>
-            )}
-          </form.Subscribe>
-        </form>
-      </DialogContent>
-    </Dialog>
+                  {({ name, icon, colorHex, frequencyType, weeklyCount, selectedDays }) => (
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-gray-400">Preview</Label>
+                      <div className="bg-zinc-900 rounded-2xl p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{icon}</span>
+                          <div>
+                            <p className="text-white font-medium">{name || "Habit name"}</p>
+                            <p className="text-xs text-gray-400">
+                              {getFrequencyText(frequencyType, weeklyCount, selectedDays)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          {[...Array(7)].map((_, i) => {
+                            const isFirst = i < 4;
+                            return (
+                              <div
+                                key={i}
+                                className="w-6 h-6 rounded"
+                                style={{
+                                  backgroundColor: isFirst ? colorHex : "#27272a",
+                                  border: isFirst ? "none" : "1px solid #3f3f46",
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </form.Subscribe>
+              </motion.div>
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                {/* Actions */}
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                  {([canSubmit, isSubmitting]) => (
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={onClose}
+                        className="flex-1 text-gray-400 hover:text-white hover:bg-zinc-900"
+                      >
+                        Cancel
+                      </Button>
+                      {editingHabit && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={handleArchive}
+                          disabled={archiveHabit.isPending}
+                          className="flex-1 text-red-400 hover:text-red-300 hover:bg-red-950"
+                        >
+                          Archive
+                        </Button>
+                      )}
+                      <Button
+                        type="submit"
+                        disabled={!canSubmit || isSubmitting}
+                        className="flex-1 bg-white text-black hover:bg-gray-200"
+                      >
+                        {editingHabit ? "Save" : "Add"}
+                      </Button>
+                    </div>
+                  )}
+                </form.Subscribe>
+              </motion.div>
+            </motion.form>
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }

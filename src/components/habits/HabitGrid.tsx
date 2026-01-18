@@ -1,9 +1,11 @@
+import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import type { Habit } from "@/db/schema";
 import { useToggleCompletion } from "@/hooks/use-habits";
 import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
 import { isHabitDueOnDate } from "@/lib/habit-logic";
+import { cn } from "@/lib/utils";
 
 interface HabitGridProps {
   habits: Habit[];
@@ -37,11 +39,14 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
   return (
     <div className="space-y-3">
       {/* Day headers */}
-      <div className="grid grid-cols-[1fr_auto] gap-4 items-center pb-2">
+      <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center pb-2 px-2 sm:px-4">
         <div />
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {weekDays.map((day) => (
-            <div key={day.toISOString()} className="text-center text-xs font-medium text-gray-400 w-10">
+            <div
+              key={day.toISOString()}
+              className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-400 w-7 sm:w-10"
+            >
               {getDayAbbreviation(day)}
             </div>
           ))}
@@ -49,22 +54,31 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
       </div>
 
       {/* Habit rows */}
-      {visibleHabits.map((habit) => (
-        <HabitRow
-          key={habit.id}
-          habit={habit}
-          completions={completions[habit.id] || []}
-          weekDays={weekDays}
-          onToggle={(date) =>
-            toggleCompletion.mutate({
-              habitId: habit.id,
-              date,
-              habitName: habit.name,
-            })
-          }
-          onEdit={() => onEditHabit(habit)}
-        />
-      ))}
+      <AnimatePresence mode="sync">
+        {visibleHabits.map((habit, index) => (
+          <motion.div
+            key={habit.id}
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
+            transition={{ duration: 0.2, delay: index * 0.05 }}
+          >
+            <HabitRow
+              habit={habit}
+              completions={completions[habit.id] || []}
+              weekDays={weekDays}
+              onToggle={(date) =>
+                toggleCompletion.mutate({
+                  habitId: habit.id,
+                  date,
+                  habitName: habit.name,
+                })
+              }
+              onEdit={() => onEditHabit(habit)}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
@@ -82,19 +96,19 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
   const icon = habit.icon || DEFAULT_ICON;
 
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-4 items-center bg-zinc-900 rounded-2xl p-4">
+    <div className="grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center bg-zinc-900 rounded-2xl p-2 sm:p-4">
       {/* Habit name */}
       <button
         type="button"
         onClick={onEdit}
-        className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 sm:gap-3 text-left hover:opacity-80 transition-opacity"
       >
-        <span className="text-2xl">{icon}</span>
-        <span className="text-white font-medium">{habit.name}</span>
+        <span className="text-lg sm:text-2xl">{icon}</span>
+        <span className="text-white font-medium text-sm sm:text-base">{habit.name}</span>
       </button>
 
       {/* Completion squares */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {weekDays.map((day) => {
           const dateStr = toDateString(day);
           const isCompleted = completions.includes(dateStr);
@@ -102,17 +116,19 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
           const isTodaySquare = isToday(day);
 
           return (
-            <button
+            <motion.button
               key={day.toISOString()}
               type="button"
               onClick={() => onToggle(dateStr)}
               disabled={!isDue}
-              className={`
-								w-10 h-10 rounded-lg transition-all
-								${isCompleted ? "opacity-100" : "opacity-100"}
-								${isTodaySquare ? "ring-2 ring-white ring-offset-2 ring-offset-black" : ""}
-								${!isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80"}
-							`}
+              whileTap={isDue ? { scale: 0.9 } : {}}
+              whileHover={isDue ? { scale: 1.05 } : {}}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                "w-7 h-7 sm:w-10 sm:h-10 rounded-lg transition-all",
+                isTodaySquare && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
+                !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80"
+              )}
               style={{
                 backgroundColor: isCompleted ? color : "#27272a",
                 border: isCompleted ? "none" : "1px solid #3f3f46",

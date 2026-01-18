@@ -35,7 +35,7 @@ function AuthenticatedLayout() {
             {user && (
               <div className="flex items-center gap-3">
                 {user.image && <img src={user.image} alt={user.name} className="h-8 w-8 rounded-full" />}
-                <span className="text-sm text-foreground">{user.name}</span>
+                <span className="text-sm text-foreground hidden sm:block">{user.name}</span>
               </div>
             )}
             <button
