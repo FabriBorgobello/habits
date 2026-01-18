@@ -61,9 +61,9 @@ export function HabitGrid({ habits, completions, weekDays, hideNonDueToday, onEd
         {visibleHabits.map((habit, index) => (
           <motion.div
             key={habit.id}
-            initial={{ opacity: 0, y: 10, height: 0 }}
+            initial={{ opacity: 0, y: 3, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
-            exit={{ opacity: 0, y: -10, height: 0 }}
+            exit={{ opacity: 0, y: -3, height: 0 }}
             transition={{ duration: 0.2, delay: index * 0.05 }}
           >
             <HabitRow

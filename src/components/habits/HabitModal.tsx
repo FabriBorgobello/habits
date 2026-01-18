@@ -115,12 +115,16 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
         <Drawer.Content className="bg-zinc-950 flex flex-col rounded-t-3xl max-h-[85dvh] fixed bottom-0 left-0 right-0 pb-[env(safe-area-inset-bottom)]">
-          <div className="px-4 py-4 sm:p-6 bg-zinc-950 rounded-t-3xl flex-1 overflow-y-auto overscroll-contain">
-            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-700 mb-4 sm:mb-8" />
+          {/* Fixed handle and title */}
+          <div className="shrink-0 px-4 pt-4 sm:pt-6 bg-zinc-950 rounded-t-3xl">
+            <div className="mx-auto w-12 h-1.5 rounded-full bg-zinc-700 mb-4 sm:mb-6" />
             <Drawer.Title className="text-white text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
               {editingHabit ? "Edit Habit" : "New Habit"}
             </Drawer.Title>
+          </div>
 
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4 sm:px-6 sm:pb-6">
             <motion.form
               onSubmit={(e) => {
                 e.preventDefault();
