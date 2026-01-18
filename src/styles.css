@@ -162,6 +162,18 @@ code {
 @supports (padding: env(safe-area-inset-top)) {
   html {
     /* Ensure the background color extends behind the safe area */
-    background-color: var(--card);
+    background-color: var(--background);
   }
+  
+  body {
+    /* Prevent content from being cut off */
+    min-height: 100svh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Ensure html takes full height for PWA */
+html {
+  height: 100%;
+  height: -webkit-fill-available;
 }

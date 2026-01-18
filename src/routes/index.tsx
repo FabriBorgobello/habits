@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-svh flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
         <span className="text-lg font-semibold text-primary">Habits</span>
