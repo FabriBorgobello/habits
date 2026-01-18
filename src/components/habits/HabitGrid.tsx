@@ -127,7 +127,7 @@ function HabitRow({ habit, completions, weekDays, onToggle, onEdit }: HabitRowPr
               className={cn(
                 "w-7 h-7 sm:w-10 sm:h-10 rounded-lg transition-all",
                 isTodaySquare && "ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black",
-                !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80"
+                !isDue ? "opacity-30 cursor-not-allowed" : "hover:opacity-80",
               )}
               style={{
                 backgroundColor: isCompleted ? color : "#27272a",
