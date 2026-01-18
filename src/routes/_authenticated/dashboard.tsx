@@ -1,48 +1,85 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { HabitGrid } from "@/components/habits/HabitGrid";
+import { HabitModal } from "@/components/habits/HabitModal";
+import { WeekHeader } from "@/components/habits/WeekHeader";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import type { Habit } from "@/db/schema";
+import { useHabits } from "@/hooks/use-habits";
+import { getCurrentWeekView, toDateString } from "@/lib/date-utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
 function DashboardPage() {
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [hideNonDueToday, setHideNonDueToday] = useState(false);
+
+  // Get current week view
+  const weekView = getCurrentWeekView();
+  const startDateStr = toDateString(weekView.startDate);
+  const endDateStr = toDateString(weekView.endDate);
+
+  // Fetch habits and completions
+  const { data, isLoading } = useHabits(startDateStr, endDateStr);
+
+  const handleOpenModal = (habit?: Habit) => {
+    setEditingHabit(habit || null);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingHabit(null);
+  };
 
   return (
-    <div className="px-6 py-8">
-      <div className="max-w-3xl mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold">Today</h1>
-          <p className="text-sm text-muted-foreground mt-1">{today}</p>
+    <div className="min-h-screen bg-black text-white px-6 py-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header with + button */}
+        <div className="flex items-start justify-between mb-8">
+          <WeekHeader startDate={weekView.startDate} endDate={weekView.endDate} />
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="w-14 h-14 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors"
+            aria-label="Create new habit"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <title>Plus</title>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
         </div>
 
-        {/* Empty State */}
-        <div className="rounded-xl border border-border bg-card p-12">
-          <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <div className="rounded-full bg-secondary p-4">
-              <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <title>Plus icon</title>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">No habits yet</h2>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Start building better habits. Create your first habit to begin tracking.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="mt-2 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Create your first habit
-            </button>
-          </div>
+        {/* Hide filter toggle */}
+        <div className="flex items-center space-x-2 mb-6">
+          <Switch id="hide-filter" checked={hideNonDueToday} onCheckedChange={setHideNonDueToday} />
+          <Label htmlFor="hide-filter" className="text-gray-400 text-sm cursor-pointer">
+            Hide habits not due today
+          </Label>
         </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">Loading...</p>
+          </div>
+        ) : (
+          <HabitGrid
+            habits={data?.habits || []}
+            completions={data?.completions || {}}
+            weekDays={weekView.days}
+            hideNonDueToday={hideNonDueToday}
+            onEditHabit={handleOpenModal}
+          />
+        )}
+
+        {/* Modal */}
+        <HabitModal open={modalOpen} onClose={handleCloseModal} editingHabit={editingHabit} />
       </div>
     </div>
   );
