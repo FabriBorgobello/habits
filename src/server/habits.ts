@@ -197,10 +197,7 @@ export const reorderHabitsFn = createServerFn({ method: "POST" })
     // Update sort order for each habit
     await Promise.all(
       data.orderedIds.map((id, index) =>
-        db
-          .update(habits)
-          .set({ sortOrder: index, updatedAt: new Date() })
-          .where(eq(habits.id, id)),
+        db.update(habits).set({ sortOrder: index, updatedAt: new Date() }).where(eq(habits.id, id)),
       ),
     );
 

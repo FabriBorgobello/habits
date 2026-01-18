@@ -79,9 +79,7 @@ function DashboardPage() {
               type="button"
               onClick={() => setReorderMode(!reorderMode)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                reorderMode
-                  ? "bg-white text-black"
-                  : "bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700"
+                reorderMode ? "bg-white text-black" : "bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700"
               }`}
             >
               {reorderMode ? (

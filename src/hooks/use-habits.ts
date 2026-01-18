@@ -154,9 +154,7 @@ export function useReorderHabits() {
         if (!old || typeof old !== "object") return old;
 
         const typedOld = old as { habits: Array<{ id: string }>; completions: Record<string, string[]> };
-        const orderedHabits = orderedIds
-          .map((id) => typedOld.habits.find((h) => h.id === id))
-          .filter(Boolean);
+        const orderedHabits = orderedIds.map((id) => typedOld.habits.find((h) => h.id === id)).filter(Boolean);
 
         return { ...typedOld, habits: orderedHabits };
       });
