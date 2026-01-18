@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import { authMiddleware } from "@/lib/auth-middleware";
 
@@ -24,13 +24,9 @@ function AuthenticatedLayout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] bg-card">
       <header className="border-b border-border bg-card">
-        <div className="flex h-14 items-center justify-between px-6">
-          <Link to="/dashboard" className="text-lg font-semibold text-primary">
-            Habits
-          </Link>
-
+        <div className="flex h-14 items-center justify-end px-6">
           <div className="flex items-center gap-4">
             {user && (
               <div className="flex items-center gap-3">
