@@ -203,9 +203,7 @@ function HabitRow({
 
         {/* Habit name */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <span className="text-lg sm:text-2xl shrink-0">
-            {icon}
-          </span>
+          <span className="text-lg sm:text-2xl shrink-0">{icon}</span>
           <div className="min-w-0 flex-1">
             <span className="text-white font-medium text-sm sm:text-base truncate line-clamp-1 block">
               {habit.name}
