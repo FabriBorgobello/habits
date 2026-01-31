@@ -81,27 +81,18 @@ export function HabitGrid({
   return (
     <div className="space-y-2">
       {/* Day headers */}
-      <motion.div layout="position" className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4">
-        {/* Spacer for drag handle column - only in reorder mode */}
-        <AnimatePresence mode="wait">
-          {reorderMode && (
-            <motion.div
-              key="drag-spacer"
-              layout
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="shrink-0 overflow-hidden"
-            >
-              <div className="w-6 sm:w-7" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4">
+        {/* Spacer for drag handle column */}
+        <motion.div
+          initial={false}
+          animate={{ width: reorderMode ? 28 : 0, opacity: reorderMode ? 1 : 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="shrink-0 overflow-hidden"
+        />
         {/* Spacer for habit name */}
-        <motion.div layout="position" className="flex-1" />
+        <div className="flex-1" />
         {/* Day abbreviations */}
-        <motion.div layout="position" className="flex gap-1 sm:gap-2 shrink-0">
+        <div className="flex gap-1 sm:gap-2 shrink-0">
           {weekDays.map((day) => (
             <div
               key={day.toISOString()}
@@ -113,24 +104,15 @@ export function HabitGrid({
               {getDayAbbreviation(day)}
             </div>
           ))}
-        </motion.div>
-        {/* Spacer for menu column - only when not in reorder mode */}
-        <AnimatePresence mode="wait">
-          {!reorderMode && (
-            <motion.div
-              key="menu-spacer"
-              layout
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="shrink-0 overflow-hidden"
-            >
-              <div className="w-7 sm:w-8" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+        </div>
+        {/* Spacer for menu column */}
+        <motion.div
+          initial={false}
+          animate={{ width: reorderMode ? 0 : 32, opacity: reorderMode ? 0 : 1 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="shrink-0 overflow-hidden"
+        />
+      </div>
 
       {/* Habit rows */}
       <Reorder.Group axis="y" values={visibleHabits} onReorder={handleReorder} as="div" className="space-y-2">
@@ -201,45 +183,39 @@ function HabitRow({
       className="relative bg-zinc-950 rounded-2xl p-2 sm:p-4"
       style={{ "--habit-color": color } as React.CSSProperties}
     >
-      <motion.div layout="position" className="flex items-center gap-2 sm:gap-4">
-        {/* Drag handle - only in reorder mode */}
-        <AnimatePresence mode="wait">
-          {reorderMode && (
-            <motion.button
-              key="drag-handle"
-              layout
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              type="button"
-              onPointerDown={(e) => dragControls.start(e)}
-              className="touch-none p-1 rounded transition-colors text-gray-500 shrink-0 cursor-grab hover:text-gray-300 hover:bg-zinc-800 active:cursor-grabbing overflow-hidden"
-              aria-label={`Drag to reorder ${habit.name}`}
-            >
-              <GripVertical className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Habit name */}
-        <motion.div layout="position" className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <motion.span layout="position" className="text-lg sm:text-2xl shrink-0">
-            {icon}
-          </motion.span>
-          <motion.div layout="position" className="min-w-0 flex-1">
-            <motion.span
-              layout="position"
-              className="text-white font-medium text-sm sm:text-base truncate line-clamp-1 block"
-            >
-              {habit.name}
-            </motion.span>
-            {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
-          </motion.div>
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Drag handle */}
+        <motion.div
+          initial={false}
+          animate={{ width: reorderMode ? "auto" : 0, opacity: reorderMode ? 1 : 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="shrink-0 overflow-hidden"
+        >
+          <button
+            type="button"
+            onPointerDown={(e) => dragControls.start(e)}
+            className="touch-none p-1 rounded transition-colors text-gray-500 shrink-0 cursor-grab hover:text-gray-300 hover:bg-zinc-800 active:cursor-grabbing"
+            aria-label={`Drag to reorder ${habit.name}`}
+          >
+            <GripVertical className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
         </motion.div>
 
+        {/* Habit name */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <span className="text-lg sm:text-2xl shrink-0">
+            {icon}
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className="text-white font-medium text-sm sm:text-base truncate line-clamp-1 block">
+              {habit.name}
+            </span>
+            {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
+          </div>
+        </div>
+
         {/* Completion squares */}
-        <motion.div layout="position" className="flex gap-1 sm:gap-2 shrink-0">
+        <div className="flex gap-1 sm:gap-2 shrink-0">
           {weekDays.map((day) => {
             const dateStr = toDateString(day);
             const isCompleted = completions.includes(dateStr);
@@ -268,45 +244,38 @@ function HabitRow({
               />
             );
           })}
-        </motion.div>
+        </div>
 
-        {/* Options menu - hidden in reorder mode */}
-        <AnimatePresence mode="wait">
-          {!reorderMode && (
-            <motion.div
-              key="menu-button"
-              layout
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="shrink-0 overflow-hidden"
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white shrink-0"
-                    aria-label={`Options for ${habit.name}`}
-                  >
-                    <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
-                  <DropdownMenuItem onClick={onEdit} className="text-white hover:bg-zinc-800 cursor-pointer">
-                    <Pencil className="w-4 h-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onArchive} variant="destructive" className="cursor-pointer">
-                    <Archive className="w-4 h-4" />
-                    Archive
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+        {/* Options menu */}
+        <motion.div
+          initial={false}
+          animate={{ width: reorderMode ? 0 : "auto", opacity: reorderMode ? 0 : 1 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="shrink-0 overflow-hidden"
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white shrink-0"
+                aria-label={`Options for ${habit.name}`}
+              >
+                <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+              <DropdownMenuItem onClick={onEdit} className="text-white hover:bg-zinc-800 cursor-pointer">
+                <Pencil className="w-4 h-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onArchive} variant="destructive" className="cursor-pointer">
+                <Archive className="w-4 h-4" />
+                Archive
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </motion.div>
+      </div>
     </Reorder.Item>
   );
 }
