@@ -299,7 +299,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {(field) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Icon</Label>
-                      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 justify-center max-h-[200px] overflow-y-auto overscroll-contain rounded-xl">
+                      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 justify-center max-h-[200px] overflow-y-auto overscroll-contain rounded-xl p-1">
                         {HABIT_ICONS.map((emoji) => (
                           <button
                             key={emoji}
