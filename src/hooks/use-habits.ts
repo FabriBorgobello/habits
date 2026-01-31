@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { z } from "zod";
 import type { insertHabitSchema } from "@/db/schema";
@@ -20,6 +20,7 @@ export function useHabits(startDate: string, endDate: string) {
   return useQuery({
     queryKey: ["habits", startDate, endDate],
     queryFn: () => getHabitsWithCompletionsFn({ data: { startDate, endDate } }),
+    placeholderData: keepPreviousData,
   });
 }
 

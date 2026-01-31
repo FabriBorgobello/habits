@@ -1,10 +1,13 @@
 import { useForm } from "@tanstack/react-form";
+import { Plus } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { Drawer } from "vaul";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Habit } from "@/db/schema";
+import { useCategories, useCreateCategory } from "@/hooks/use-categories";
 import { useCreateHabit, useUpdateHabit } from "@/hooks/use-habits";
 import { DEFAULT_COLOR, DEFAULT_ICON, HABIT_COLORS, HABIT_ICONS } from "@/lib/habit-constants";
 import { cn } from "@/lib/utils";
@@ -22,6 +25,10 @@ const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
 export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   const createHabit = useCreateHabit();
   const updateHabit = useUpdateHabit();
+  const { data: categoriesData } = useCategories();
+  const createCategory = useCreateCategory();
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [customCategoryName, setCustomCategoryName] = useState("");
 
   // Extract initial values from editing habit
   const getInitialFrequencyType = (): FrequencyType => {
@@ -51,6 +58,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   const form = useForm({
     defaultValues: {
       name: editingHabit?.name || "",
+      category: editingHabit?.category || "",
       colorHex: editingHabit?.colorHex || DEFAULT_COLOR,
       icon: editingHabit?.icon || DEFAULT_ICON,
       frequencyType: getInitialFrequencyType(),
@@ -61,7 +69,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
       const habitData = {
         name: value.name,
         description: "",
-        category: "",
+        category: value.category,
         colorHex: value.colorHex,
         icon: value.icon,
         frequency: value.frequencyType === "daily" ? ("daily" as const) : ("custom" as const),
@@ -96,6 +104,8 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       onClose();
+      setShowCustomCategory(false);
+      setCustomCategoryName("");
       setTimeout(() => form.reset(), 200);
     }
   };
@@ -175,6 +185,82 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   visible: { opacity: 1, y: 0 },
                 }}
               >
+                {/* Category */}
+                <form.Field name="category">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-gray-400">Category</Label>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        {(categoriesData ?? []).map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => field.handleChange(field.state.value === cat.name ? "" : cat.name)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors",
+                              field.state.value === cat.name
+                                ? "bg-zinc-700 text-white ring-1 ring-zinc-500"
+                                : "bg-zinc-900 text-gray-400 hover:bg-zinc-800",
+                            )}
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
+                        {!showCustomCategory && (
+                          <button
+                            type="button"
+                            onClick={() => setShowCustomCategory(true)}
+                            className="px-3 py-1.5 rounded-lg text-xs sm:text-sm bg-zinc-900 text-gray-500 hover:bg-zinc-800 hover:text-gray-300 transition-colors flex items-center gap-1"
+                          >
+                            <Plus className="w-3 h-3" />
+                            Custom
+                          </button>
+                        )}
+                      </div>
+                      {showCustomCategory && (
+                        <div className="flex gap-2 mt-2">
+                          <Input
+                            value={customCategoryName}
+                            onChange={(e) => setCustomCategoryName(e.target.value.slice(0, 50))}
+                            placeholder="Category name"
+                            className="bg-zinc-950 border-zinc-800 text-white placeholder:text-gray-500 text-sm"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Escape") {
+                                setShowCustomCategory(false);
+                                setCustomCategoryName("");
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            disabled={!customCategoryName.trim() || createCategory.isPending}
+                            onClick={async () => {
+                              const name = customCategoryName.trim();
+                              if (!name) return;
+                              await createCategory.mutateAsync({ name });
+                              field.handleChange(name);
+                              setCustomCategoryName("");
+                              setShowCustomCategory(false);
+                            }}
+                            className="bg-white text-black hover:bg-gray-200 shrink-0"
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
+              </motion.div>
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
                 {/* Color */}
                 <form.Field name="colorHex">
                   {(field) => (
@@ -213,7 +299,7 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                   {(field) => (
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-gray-400">Icon</Label>
-                      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 justify-center">
+                      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 justify-center max-h-[200px] overflow-y-auto overscroll-contain rounded-xl">
                         {HABIT_ICONS.map((emoji) => (
                           <button
                             key={emoji}

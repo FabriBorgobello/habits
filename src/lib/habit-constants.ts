@@ -10,6 +10,7 @@ export const HABIT_COLORS = [
 ] as const;
 
 export const HABIT_ICONS = [
+  // Original
   "🧘",
   "💊",
   "✏️",
@@ -25,7 +26,48 @@ export const HABIT_ICONS = [
   "🧠",
   "❤️",
   "🍃",
+  // Health
+  "🩺",
+  "🧴",
+  "🧼",
+  "🪥",
+  // Fitness
+  "🚴",
+  "🏊",
+  "🧗",
+  "🤸",
+  // Mind
+  "🎨",
+  "🎵",
+  "🎭",
+  "🧩",
+  // Nature
+  "🌱",
+  "🌻",
+  "🌳",
+  "♻️",
+  "🌍",
+  // Productivity
+  "⏰",
+  "📝",
+  "💻",
+  "📊",
+  "🎯",
+  // Social
+  "👥",
+  "📞",
+  "💌",
+  "🤝",
 ] as const;
 
 export const DEFAULT_COLOR = HABIT_COLORS[0].value;
 export const DEFAULT_ICON = HABIT_ICONS[0];
+
+export const DEFAULT_CATEGORIES = [
+  { name: "Self Care", colorHex: "#f783ac" },
+  { name: "Sleep", colorHex: "#b197fc" },
+  { name: "Food", colorHex: "#ffa94d" },
+  { name: "Exercise", colorHex: "#51cf66" },
+  { name: "Pets", colorHex: "#ffd43b" },
+  { name: "Cleaning", colorHex: "#4dabf7" },
+] as const;

@@ -1,13 +1,14 @@
 import { Archive, GripVertical, MoreVertical, Pencil } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useMemo } from "react";
+import { CategoryBadge } from "@/components/habits/CategoryBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Habit } from "@/db/schema";
+import type { Category, Habit } from "@/db/schema";
 import { useReorderHabits, useToggleCompletion } from "@/hooks/use-habits";
 import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
@@ -18,6 +19,7 @@ interface HabitGridProps {
   habits: Habit[];
   completions: Record<string, string[]>;
   weekDays: Date[];
+  categories: Category[];
   hideNonDueToday: boolean;
   reorderMode: boolean;
   onEditHabit: (habit: Habit) => void;
@@ -28,6 +30,7 @@ export function HabitGrid({
   habits,
   completions,
   weekDays,
+  categories,
   hideNonDueToday,
   reorderMode,
   onEditHabit,
@@ -43,6 +46,14 @@ export function HabitGrid({
     const today = new Date();
     return habits.filter((habit) => isHabitDueOnDate(habit, today));
   }, [habits, hideNonDueToday]);
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, Category>();
+    for (const cat of categories) {
+      map.set(cat.name, cat);
+    }
+    return map;
+  }, [categories]);
 
   const handleReorder = (newOrder: Habit[]) => {
     if (reorderMode) {
@@ -70,9 +81,9 @@ export function HabitGrid({
   return (
     <div className="space-y-2">
       {/* Day headers */}
-      <motion.div layout="position" className="flex items-center gap-2 sm:gap-4 sm:px-4">
+      <motion.div layout="position" className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4">
         {/* Spacer for drag handle column - only in reorder mode */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           {reorderMode && (
             <motion.div
               key="drag-spacer"
@@ -104,7 +115,7 @@ export function HabitGrid({
           ))}
         </motion.div>
         {/* Spacer for menu column - only when not in reorder mode */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           {!reorderMode && (
             <motion.div
               key="menu-spacer"
@@ -130,6 +141,7 @@ export function HabitGrid({
               habit={habit}
               completions={completions[habit.id] || []}
               weekDays={weekDays}
+              category={categoryMap.get(habit.category)}
               index={index}
               reorderMode={canReorder}
               onToggle={(date) =>
@@ -153,6 +165,7 @@ interface HabitRowProps {
   habit: Habit;
   completions: string[];
   weekDays: Date[];
+  category?: Category;
   index: number;
   reorderMode: boolean;
   onToggle: (date: string) => void;
@@ -160,7 +173,17 @@ interface HabitRowProps {
   onArchive: () => void;
 }
 
-function HabitRow({ habit, completions, weekDays, index, reorderMode, onToggle, onEdit, onArchive }: HabitRowProps) {
+function HabitRow({
+  habit,
+  completions,
+  weekDays,
+  category,
+  index,
+  reorderMode,
+  onToggle,
+  onEdit,
+  onArchive,
+}: HabitRowProps) {
   const color = habit.colorHex || DEFAULT_COLOR;
   const icon = habit.icon || DEFAULT_ICON;
   const dragControls = useDragControls();
@@ -175,12 +198,12 @@ function HabitRow({ habit, completions, weekDays, index, reorderMode, onToggle, 
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -3 }}
       transition={{ duration: 0.2, delay: index * 0.05 }}
-      className="relative bg-zinc-950 rounded-2xl p-2 px-0 sm:p-4"
+      className="relative bg-zinc-950 rounded-2xl p-2 sm:p-4"
       style={{ "--habit-color": color } as React.CSSProperties}
     >
       <motion.div layout="position" className="flex items-center gap-2 sm:gap-4">
         {/* Drag handle - only in reorder mode */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           {reorderMode && (
             <motion.button
               key="drag-handle"
@@ -204,9 +227,15 @@ function HabitRow({ habit, completions, weekDays, index, reorderMode, onToggle, 
           <motion.span layout="position" className="text-lg sm:text-2xl shrink-0">
             {icon}
           </motion.span>
-          <motion.span layout="position" className="text-white font-medium text-sm sm:text-base truncate line-clamp-1">
-            {habit.name}
-          </motion.span>
+          <motion.div layout="position" className="min-w-0 flex-1">
+            <motion.span
+              layout="position"
+              className="text-white font-medium text-sm sm:text-base truncate line-clamp-1 block"
+            >
+              {habit.name}
+            </motion.span>
+            {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
+          </motion.div>
         </motion.div>
 
         {/* Completion squares */}
@@ -242,7 +271,7 @@ function HabitRow({ habit, completions, weekDays, index, reorderMode, onToggle, 
         </motion.div>
 
         {/* Options menu - hidden in reorder mode */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           {!reorderMode && (
             <motion.div
               key="menu-button"

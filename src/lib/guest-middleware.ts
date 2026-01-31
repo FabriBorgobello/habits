@@ -12,7 +12,7 @@ export const guestMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await auth.api.getSession({ headers });
 
   if (session) {
-    throw redirect({ to: "/dashboard" });
+    throw redirect({ to: "/dashboard", search: { week: undefined } });
   }
 
   return await next();

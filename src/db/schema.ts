@@ -79,6 +79,19 @@ type FrequencyConfigType = z.infer<typeof frequencyConfigSchema>;
 // Habit Tracker Tables
 // ============================================================================
 
+export const categories = pgTable("categories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  colorHex: text("color_hex"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isDefault: boolean("is_default").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const habits = pgTable("habits", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
@@ -139,6 +152,14 @@ export const selectHabitSchema = createSelectSchema(habits);
 export const insertHabitCompletionSchema = createInsertSchema(habitCompletions);
 export const selectHabitCompletionSchema = createSelectSchema(habitCompletions);
 
+// Category schemas
+export const insertCategorySchema = createInsertSchema(categories).omit({
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const selectCategorySchema = createSelectSchema(categories);
+
 // ============================================================================
 // TypeScript Types
 // ============================================================================
@@ -151,6 +172,9 @@ export type NewHabit = typeof habits.$inferInsert;
 
 export type HabitCompletion = typeof habitCompletions.$inferSelect;
 export type NewHabitCompletion = typeof habitCompletions.$inferInsert;
+
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
 
 export type WeeklyCountConfig = z.infer<typeof weeklyCountConfigSchema>;
 export type SpecificDaysConfig = z.infer<typeof specificDaysConfigSchema>;
