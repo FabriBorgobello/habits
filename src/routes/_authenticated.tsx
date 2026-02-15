@@ -1,9 +1,10 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { CheckSquare, LayoutDashboard, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
@@ -51,6 +52,19 @@ function AuthenticatedLayout() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" search={{ week: undefined }}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Habits
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/todo">
+                    <CheckSquare className="mr-2 h-4 w-4" />
+                    Tasks
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out

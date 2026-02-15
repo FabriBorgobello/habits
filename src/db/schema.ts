@@ -129,6 +129,22 @@ export const habitCompletions = pgTable(
 );
 
 // ============================================================================
+// Todo Tables
+// ============================================================================
+
+export const todos = pgTable("todos", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  completed: boolean("completed").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================================================
 // Exported Zod Schemas for External Use
 // ============================================================================
 
@@ -160,6 +176,15 @@ export const insertCategorySchema = createInsertSchema(categories).omit({
 });
 export const selectCategorySchema = createSelectSchema(categories);
 
+// Todo schemas
+export const insertTodoSchema = createInsertSchema(todos).omit({
+  userId: true,
+  completed: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const selectTodoSchema = createSelectSchema(todos);
+
 // ============================================================================
 // TypeScript Types
 // ============================================================================
@@ -175,6 +200,9 @@ export type NewHabitCompletion = typeof habitCompletions.$inferInsert;
 
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
+
+export type Todo = typeof todos.$inferSelect;
+export type NewTodo = typeof todos.$inferInsert;
 
 export type WeeklyCountConfig = z.infer<typeof weeklyCountConfigSchema>;
 export type SpecificDaysConfig = z.infer<typeof specificDaysConfigSchema>;
