@@ -25,10 +25,7 @@ export function TodoItem({ todo, reorderMode, onToggle, onDelete }: TodoItemProp
     >
       {/* biome-ignore lint/a11y/noStaticElementInteractions: row click delegates to inner checkbox */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled by inner checkbox */}
-      <div
-        className="flex items-center gap-3 cursor-pointer"
-        onClick={onToggle}
-      >
+      <div className="flex items-center gap-3 cursor-pointer" onClick={onToggle}>
         <input
           type="checkbox"
           checked={todo.completed}
