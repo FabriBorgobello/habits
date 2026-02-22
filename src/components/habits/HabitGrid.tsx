@@ -1,3 +1,4 @@
+import confetti from "canvas-confetti";
 import { Archive, GripVertical, MoreVertical, Pencil } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useMemo } from "react";
@@ -12,7 +13,7 @@ import type { Category, Habit } from "@/db/schema";
 import { useReorderHabits, useToggleCompletion } from "@/hooks/use-habits";
 import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
-import { isHabitDueOnDate } from "@/lib/habit-logic";
+import { getWeeklyProgress, isHabitDueOnDate } from "@/lib/habit-logic";
 import { cn } from "@/lib/utils";
 
 interface HabitGridProps {
@@ -169,6 +170,7 @@ function HabitRow({
   const color = habit.colorHex || DEFAULT_COLOR;
   const icon = habit.icon || DEFAULT_ICON;
   const dragControls = useDragControls();
+  const weeklyProgress = getWeeklyProgress(habit, completions, weekDays);
 
   return (
     <Reorder.Item
@@ -208,7 +210,19 @@ function HabitRow({
             <span className="text-white font-medium text-sm sm:text-base truncate line-clamp-1 block">
               {habit.name}
             </span>
-            {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
+              {weeklyProgress && (
+                <span
+                  className={cn(
+                    "text-[10px] sm:text-xs font-medium",
+                    weeklyProgress.isMet ? "text-(--habit-color)" : "text-gray-500",
+                  )}
+                >
+                  {weeklyProgress.completed}/{weeklyProgress.target} this week{weeklyProgress.isMet && " 🎉"}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -224,7 +238,12 @@ function HabitRow({
               <motion.button
                 key={day.toISOString()}
                 type="button"
-                onClick={() => onToggle(dateStr)}
+                onClick={() => {
+                  if (!isCompleted && weeklyProgress && weeklyProgress.completed + 1 === weeklyProgress.target) {
+                    confetti();
+                  }
+                  onToggle(dateStr);
+                }}
                 disabled={!isDue}
                 whileTap={isDue ? { scale: 0.9 } : {}}
                 whileHover={isDue ? { scale: 1.05 } : {}}

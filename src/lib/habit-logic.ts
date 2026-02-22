@@ -1,4 +1,27 @@
 import type { Habit } from "@/db/schema";
+import { toDateString } from "@/lib/date-utils";
+
+/**
+ * Returns weekly progress for weekly_count habits, or null for other types.
+ */
+export function getWeeklyProgress(
+  habit: Habit,
+  completions: string[],
+  weekDays: Date[],
+): { completed: number; target: number; isMet: boolean } | null {
+  if (habit.frequency !== "custom" || !habit.frequencyConfig) return null;
+
+  const config = habit.frequencyConfig as
+    | { type: "weekly_count"; count: number }
+    | { type: "specific_days"; days: number[] };
+
+  if (config.type !== "weekly_count") return null;
+
+  const weekDateStrings = new Set(weekDays.map(toDateString));
+  const completed = completions.filter((d) => weekDateStrings.has(d)).length;
+
+  return { completed, target: config.count, isMet: completed >= config.count };
+}
 
 /**
  * Checks if a habit is due on a specific date based on its frequency configuration
