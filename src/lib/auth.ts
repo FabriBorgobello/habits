@@ -1,9 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { testUtils } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { db } from "@/db/index.ts";
 import * as schema from "@/db/schema.ts";
 import { env } from "@/env.ts";
+
+const isTest = process.env.NODE_ENV === "test";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,9 +24,14 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
+  ...(isTest
+    ? {
+        emailAndPassword: { enabled: true },
+        user: { deleteUser: { enabled: true } },
+      }
+    : {}),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ["http://localhost:3000", "https://habits.f0.ar"],
-  // tanstackStartCookies MUST be the last plugin in the array
-  plugins: [tanstackStartCookies()],
+  trustedOrigins: ["http://localhost:3000", "http://localhost:3001", "https://habits.f0.ar"],
+  plugins: [...(isTest ? [testUtils()] : []), tanstackStartCookies()],
 });
