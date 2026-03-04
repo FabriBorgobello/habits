@@ -197,7 +197,7 @@ function HabitRow({
         >
           <button
             type="button"
-            onPointerDown={(e) => dragControls.start(e)}
+            onPointerDown={(e) => { trigger(30); dragControls.start(e); }}
             className="touch-none p-1 rounded transition-colors text-gray-500 shrink-0 cursor-grab hover:text-gray-300 hover:bg-zinc-800 active:cursor-grabbing"
             aria-label={`Drag to reorder ${habit.name}`}
           >
@@ -241,9 +241,11 @@ function HabitRow({
                 key={day.toISOString()}
                 type="button"
                 onClick={() => {
-                  trigger(20);
                   if (!isCompleted && weeklyProgress && weeklyProgress.completed + 1 === weeklyProgress.target) {
+                    trigger([{ duration: 30 }, { delay: 60, duration: 40, intensity: 1 }]);
                     confetti();
+                  } else {
+                    trigger(20);
                   }
                   onToggle(dateStr);
                 }}
@@ -288,7 +290,7 @@ function HabitRow({
                 <Pencil className="w-4 h-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onArchive} variant="destructive" className="cursor-pointer">
+              <DropdownMenuItem onClick={() => { trigger([{ duration: 40 }, { delay: 40, duration: 40 }, { delay: 40, duration: 40 }], { intensity: 0.9 }); onArchive(); }} variant="destructive" className="cursor-pointer">
                 <Archive className="w-4 h-4" />
                 Archive
               </DropdownMenuItem>

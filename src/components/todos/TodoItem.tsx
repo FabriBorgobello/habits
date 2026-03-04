@@ -27,7 +27,13 @@ export function TodoItem({ todo, reorderMode, onToggle, onDelete }: TodoItemProp
     >
       {/* biome-ignore lint/a11y/noStaticElementInteractions: row click delegates to inner checkbox */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled by inner checkbox */}
-      <div className="flex items-center gap-3 cursor-pointer" onClick={() => { trigger(20); onToggle(); }}>
+      <div
+        className="flex items-center gap-3 cursor-pointer"
+        onClick={() => {
+          trigger(20);
+          onToggle();
+        }}
+      >
         <input
           type="checkbox"
           checked={todo.completed}
@@ -45,7 +51,7 @@ export function TodoItem({ todo, reorderMode, onToggle, onDelete }: TodoItemProp
         >
           <button
             type="button"
-            onPointerDown={(e) => dragControls.start(e)}
+            onPointerDown={(e) => { trigger(30); dragControls.start(e); }}
             onClick={(e) => e.stopPropagation()}
             className="touch-none p-1 rounded transition-colors text-gray-500 cursor-grab hover:text-gray-300 hover:bg-zinc-800 active:cursor-grabbing"
             aria-label={`Drag to reorder ${todo.title}`}

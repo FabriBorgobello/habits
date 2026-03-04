@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { addWeeks, startOfWeek, subWeeks } from "date-fns";
 import { ArrowUpDown, Check, ChevronLeft, ChevronRight, Filter, Plus } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { HabitGrid } from "@/components/habits/HabitGrid";
 import { HabitModal } from "@/components/habits/HabitModal";
 import { WeekHeader } from "@/components/habits/WeekHeader";
@@ -29,6 +30,7 @@ function DashboardPage() {
   const [reorderMode, setReorderMode] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const weekDirection = useRef<"prev" | "next">("next");
+  const { trigger } = useWebHaptics();
 
   // Get week view from URL param or current week
   const weekView = useMemo(() => {
@@ -111,7 +113,7 @@ function DashboardPage() {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => navigateWeek("prev")}
+                  onClick={() => { trigger(20); navigateWeek("prev"); }}
                   className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
                   aria-label="Previous week"
                 >
@@ -119,7 +121,7 @@ function DashboardPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigateWeek("next")}
+                  onClick={() => { trigger(20); navigateWeek("next"); }}
                   className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
                   aria-label="Next week"
                 >
@@ -160,7 +162,7 @@ function DashboardPage() {
               {/* Reorder mode toggle */}
               <button
                 type="button"
-                onClick={() => setReorderMode(!reorderMode)}
+                onClick={() => { trigger([{ duration: 80, intensity: 0.8 }, { delay: 80, duration: 50, intensity: 0.3 }]); setReorderMode(!reorderMode); }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors shrink-0 ${
                   reorderMode ? "bg-white text-black" : "bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700"
                 }`}
@@ -185,7 +187,7 @@ function DashboardPage() {
                 <Filter className="w-3.5 h-3.5 text-gray-500" />
                 <button
                   type="button"
-                  onClick={() => setCategoryFilter("all")}
+                  onClick={() => { trigger(15); setCategoryFilter("all"); }}
                   className={`px-2 py-1 rounded-md text-xs transition-colors ${
                     categoryFilter === "all" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"
                   }`}
@@ -196,7 +198,7 @@ function DashboardPage() {
                   <button
                     key={name}
                     type="button"
-                    onClick={() => setCategoryFilter(categoryFilter === name ? "all" : name)}
+                    onClick={() => { trigger(15); setCategoryFilter(categoryFilter === name ? "all" : name); }}
                     className={`px-2 py-1 rounded-md text-xs transition-colors ${
                       categoryFilter === name ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"
                     }`}
