@@ -113,7 +113,10 @@ function DashboardPage() {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => { trigger(20); navigateWeek("prev"); }}
+                  onClick={() => {
+                    trigger(20);
+                    navigateWeek("prev");
+                  }}
                   className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
                   aria-label="Previous week"
                 >
@@ -121,7 +124,10 @@ function DashboardPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { trigger(20); navigateWeek("next"); }}
+                  onClick={() => {
+                    trigger(20);
+                    navigateWeek("next");
+                  }}
                   className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
                   aria-label="Next week"
                 >
@@ -162,7 +168,13 @@ function DashboardPage() {
               {/* Reorder mode toggle */}
               <button
                 type="button"
-                onClick={() => { trigger([{ duration: 80, intensity: 0.8 }, { delay: 80, duration: 50, intensity: 0.3 }]); setReorderMode(!reorderMode); }}
+                onClick={() => {
+                  trigger([
+                    { duration: 80, intensity: 0.8 },
+                    { delay: 80, duration: 50, intensity: 0.3 },
+                  ]);
+                  setReorderMode(!reorderMode);
+                }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors shrink-0 ${
                   reorderMode ? "bg-white text-black" : "bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700"
                 }`}
@@ -187,7 +199,10 @@ function DashboardPage() {
                 <Filter className="w-3.5 h-3.5 text-gray-500" />
                 <button
                   type="button"
-                  onClick={() => { trigger(15); setCategoryFilter("all"); }}
+                  onClick={() => {
+                    trigger(15);
+                    setCategoryFilter("all");
+                  }}
                   className={`px-2 py-1 rounded-md text-xs transition-colors ${
                     categoryFilter === "all" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"
                   }`}
@@ -198,7 +213,10 @@ function DashboardPage() {
                   <button
                     key={name}
                     type="button"
-                    onClick={() => { trigger(15); setCategoryFilter(categoryFilter === name ? "all" : name); }}
+                    onClick={() => {
+                      trigger(15);
+                      setCategoryFilter(categoryFilter === name ? "all" : name);
+                    }}
                     className={`px-2 py-1 rounded-md text-xs transition-colors ${
                       categoryFilter === name ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"
                     }`}

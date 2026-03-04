@@ -51,7 +51,10 @@ export function TodoItem({ todo, reorderMode, onToggle, onDelete }: TodoItemProp
         >
           <button
             type="button"
-            onPointerDown={(e) => { trigger(30); dragControls.start(e); }}
+            onPointerDown={(e) => {
+              trigger(30);
+              dragControls.start(e);
+            }}
             onClick={(e) => e.stopPropagation()}
             className="touch-none p-1 rounded transition-colors text-gray-500 cursor-grab hover:text-gray-300 hover:bg-zinc-800 active:cursor-grabbing"
             aria-label={`Drag to reorder ${todo.title}`}

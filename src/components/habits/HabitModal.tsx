@@ -2,8 +2,8 @@ import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { useWebHaptics } from "web-haptics/react";
 import { Drawer } from "vaul";
+import { useWebHaptics } from "web-haptics/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -198,7 +198,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                           <button
                             key={cat.id}
                             type="button"
-                            onClick={() => { trigger(15); field.handleChange(field.state.value === cat.name ? "" : cat.name); }}
+                            onClick={() => {
+                              trigger(15);
+                              field.handleChange(field.state.value === cat.name ? "" : cat.name);
+                            }}
                             className={cn(
                               "px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors",
                               field.state.value === cat.name
@@ -274,7 +277,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                           <button
                             key={color.value}
                             type="button"
-                            onClick={() => { trigger(15); field.handleChange(color.value); }}
+                            onClick={() => {
+                              trigger(15);
+                              field.handleChange(color.value);
+                            }}
                             className={cn(
                               "w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all",
                               field.state.value === color.value
@@ -307,7 +313,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                           <button
                             key={emoji}
                             type="button"
-                            onClick={() => { trigger(15); field.handleChange(emoji); }}
+                            onClick={() => {
+                              trigger(15);
+                              field.handleChange(emoji);
+                            }}
                             className={cn(
                               "mx-auto w-full min-w-12 sm:min-w-14 h-12 sm:h-14 text-xl sm:text-2xl rounded-xl transition-all",
                               field.state.value === emoji
@@ -341,7 +350,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         {/* Daily */}
                         <button
                           type="button"
-                          onClick={() => { trigger(15); frequencyField.handleChange("daily"); }}
+                          onClick={() => {
+                            trigger(15);
+                            frequencyField.handleChange("daily");
+                          }}
                           className={cn(
                             "w-full text-left px-4 py-3 rounded-lg transition-colors",
                             frequencyField.state.value === "daily"
@@ -356,7 +368,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         <div>
                           <button
                             type="button"
-                            onClick={() => { trigger(15); frequencyField.handleChange("weekly_count"); }}
+                            onClick={() => {
+                              trigger(15);
+                              frequencyField.handleChange("weekly_count");
+                            }}
                             className={cn(
                               "w-full text-left px-4 py-3 rounded-lg transition-colors",
                               frequencyField.state.value === "weekly_count"
@@ -391,7 +406,10 @@ export function HabitModal({ open, onClose, editingHabit }: HabitModalProps) {
                         <div>
                           <button
                             type="button"
-                            onClick={() => { trigger(15); frequencyField.handleChange("specific_days"); }}
+                            onClick={() => {
+                              trigger(15);
+                              frequencyField.handleChange("specific_days");
+                            }}
                             className={cn(
                               "w-full text-left px-4 py-3 rounded-lg transition-colors",
                               frequencyField.state.value === "specific_days"
