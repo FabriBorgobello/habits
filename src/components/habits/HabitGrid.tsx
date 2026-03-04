@@ -2,6 +2,7 @@ import confetti from "canvas-confetti";
 import { Archive, GripVertical, MoreVertical, Pencil } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useMemo } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { CategoryBadge } from "@/components/habits/CategoryBadge";
 import {
   DropdownMenu,
@@ -171,6 +172,7 @@ function HabitRow({
   const icon = habit.icon || DEFAULT_ICON;
   const dragControls = useDragControls();
   const weeklyProgress = getWeeklyProgress(habit, completions, weekDays);
+  const { trigger } = useWebHaptics();
 
   return (
     <Reorder.Item
@@ -239,6 +241,7 @@ function HabitRow({
                 key={day.toISOString()}
                 type="button"
                 onClick={() => {
+                  trigger(20);
                   if (!isCompleted && weeklyProgress && weeklyProgress.completed + 1 === weeklyProgress.target) {
                     confetti();
                   }
