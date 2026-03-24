@@ -148,7 +148,7 @@ export const todos = pgTable("todos", {
 // Exported Zod Schemas for External Use
 // ============================================================================
 
-export { weeklyCountConfigSchema, specificDaysConfigSchema, frequencyConfigSchema };
+export { frequencyConfigSchema, specificDaysConfigSchema, weeklyCountConfigSchema };
 
 // User schemas
 export const insertUserSchema = createInsertSchema(user);
