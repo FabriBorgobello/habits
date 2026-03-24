@@ -9,9 +9,14 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? "50%" : undefined,
   reporter: "html",
+  timeout: process.env.CI ? 60000 : 30000,
+  expect: {
+    timeout: process.env.CI ? 15000 : 5000,
+  },
   use: {
     baseURL: `http://localhost:${E2E_PORT}`,
     trace: "on-first-retry",
+    actionTimeout: process.env.CI ? 15000 : 5000,
   },
   projects: [
     {
