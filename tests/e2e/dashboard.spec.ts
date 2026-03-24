@@ -10,13 +10,12 @@ test.describe("Dashboard", () => {
 
   test("can create a habit via the modal", async ({ page }) => {
     await page.goto("/dashboard");
+    // Wait for hydration + data load before interacting
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
+    await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
-    // Retry click until modal opens (handles SSR hydration timing)
-    await expect(async () => {
-      await page.getByLabel("Create new habit").click();
-      await expect(nameInput).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await expect(nameInput).toBeVisible();
 
     await nameInput.fill("E2E Test Habit");
     await page.getByRole("button", { name: "Add" }).click();
@@ -26,12 +25,11 @@ test.describe("Dashboard", () => {
 
   test("can create a habit with custom frequency", async ({ page }) => {
     await page.goto("/dashboard");
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
+    await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
-    await expect(async () => {
-      await page.getByLabel("Create new habit").click();
-      await expect(nameInput).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await expect(nameInput).toBeVisible();
 
     await nameInput.fill("Weekly Habit");
     await page.getByRole("button", { name: "X times per week" }).click();
@@ -42,13 +40,11 @@ test.describe("Dashboard", () => {
 
   test("can toggle habit completion", async ({ page }) => {
     await page.goto("/dashboard");
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
+    await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
-    await expect(async () => {
-      await page.getByLabel("Create new habit").click();
-      await expect(nameInput).toBeVisible();
-    }).toPass({ timeout: 15000 });
-
+    await expect(nameInput).toBeVisible();
     await nameInput.fill("Toggle Habit");
     await page.getByRole("button", { name: "Add" }).click();
     await expect(page.getByText("Toggle Habit")).toBeVisible();
@@ -62,13 +58,11 @@ test.describe("Dashboard", () => {
 
   test("can edit a habit", async ({ page }) => {
     await page.goto("/dashboard");
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
+    await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
-    await expect(async () => {
-      await page.getByLabel("Create new habit").click();
-      await expect(nameInput).toBeVisible();
-    }).toPass({ timeout: 15000 });
-
+    await expect(nameInput).toBeVisible();
     await nameInput.fill("Before Edit");
     await page.getByRole("button", { name: "Add" }).click();
     await expect(page.getByText("Before Edit")).toBeVisible();
@@ -88,13 +82,11 @@ test.describe("Dashboard", () => {
 
   test("can archive a habit", async ({ page }) => {
     await page.goto("/dashboard");
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
+    await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
-    await expect(async () => {
-      await page.getByLabel("Create new habit").click();
-      await expect(nameInput).toBeVisible();
-    }).toPass({ timeout: 15000 });
-
+    await expect(nameInput).toBeVisible();
     await nameInput.fill("To Archive");
     await page.getByRole("button", { name: "Add" }).click();
     await expect(page.getByText("To Archive")).toBeVisible();
@@ -107,12 +99,11 @@ test.describe("Dashboard", () => {
 
   test("can navigate between weeks", async ({ page }) => {
     await page.goto("/dashboard");
+    // Wait for hydration
+    await expect(page.getByText("No habits yet. Create your first habit!")).toBeVisible();
 
-    // Wait for hydration before interacting
-    await expect(async () => {
-      await page.getByLabel("Previous week").click();
-      await expect(page.getByRole("button", { name: "Today" })).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await page.getByLabel("Previous week").click();
+    await expect(page.getByRole("button", { name: "Today" })).toBeVisible();
 
     await page.getByRole("button", { name: "Today" }).click();
     await expect(page.getByRole("button", { name: "Today" })).not.toBeVisible();

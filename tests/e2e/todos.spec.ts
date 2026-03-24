@@ -10,27 +10,23 @@ test.describe("Tasks", () => {
 
   test("can create a task", async ({ page }) => {
     await page.goto("/todo");
+    // Wait for hydration + data load
+    await expect(page.getByText("No tasks yet. Add one above!")).toBeVisible();
 
-    const input = page.getByPlaceholder("Add a task...");
-    // Wait for hydration before interacting
-    await expect(async () => {
-      await input.fill("My E2E Task");
-      await input.press("Enter");
-      await expect(page.getByText("My E2E Task")).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await page.getByPlaceholder("Add a task...").fill("My E2E Task");
+    await page.getByPlaceholder("Add a task...").press("Enter");
 
+    await expect(page.getByText("My E2E Task")).toBeVisible();
     await expect(page.getByText("Pending (1)")).toBeVisible();
   });
 
   test("can complete and uncomplete a task", async ({ page }) => {
     await page.goto("/todo");
+    await expect(page.getByText("No tasks yet. Add one above!")).toBeVisible();
 
-    const input = page.getByPlaceholder("Add a task...");
-    await expect(async () => {
-      await input.fill("Complete Me");
-      await input.press("Enter");
-      await expect(page.getByText("Complete Me")).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await page.getByPlaceholder("Add a task...").fill("Complete Me");
+    await page.getByPlaceholder("Add a task...").press("Enter");
+    await expect(page.getByText("Complete Me")).toBeVisible();
 
     await page.getByLabel('Mark "Complete Me" as complete').click({ force: true });
     await expect(page.getByText("Completed (1)")).toBeVisible();
@@ -41,13 +37,11 @@ test.describe("Tasks", () => {
 
   test("can delete a task", async ({ page }) => {
     await page.goto("/todo");
+    await expect(page.getByText("No tasks yet. Add one above!")).toBeVisible();
 
-    const input = page.getByPlaceholder("Add a task...");
-    await expect(async () => {
-      await input.fill("Delete Me");
-      await input.press("Enter");
-      await expect(page.getByText("Delete Me")).toBeVisible();
-    }).toPass({ timeout: 15000 });
+    await page.getByPlaceholder("Add a task...").fill("Delete Me");
+    await page.getByPlaceholder("Add a task...").press("Enter");
+    await expect(page.getByText("Delete Me")).toBeVisible();
 
     await page.getByLabel('Delete "Delete Me"').click();
 
