@@ -9,7 +9,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can create a habit via the modal", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Create new habit").click();
 
@@ -23,7 +23,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can create a habit with custom frequency", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
@@ -37,7 +37,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can toggle habit completion", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
@@ -54,7 +54,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can edit a habit", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
@@ -77,7 +77,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can archive a habit", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Create new habit").click();
     const nameInput = page.getByPlaceholder("e.g. Morning yoga");
@@ -93,7 +93,7 @@ test.describe("Dashboard", () => {
   });
 
   test("can navigate between weeks", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.getByLabel("Previous week").click();
     await expect(page.getByRole("button", { name: "Today" })).toBeVisible();

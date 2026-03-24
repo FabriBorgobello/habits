@@ -9,7 +9,7 @@ test.describe("Tasks", () => {
   });
 
   test("can create a task", async ({ page }) => {
-    await page.goto("/todo", { waitUntil: "networkidle" });
+    await page.goto("/todo");
 
     await page.getByPlaceholder("Add a task...").fill("My E2E Task");
     await page.getByPlaceholder("Add a task...").press("Enter");
@@ -19,7 +19,7 @@ test.describe("Tasks", () => {
   });
 
   test("can complete and uncomplete a task", async ({ page }) => {
-    await page.goto("/todo", { waitUntil: "networkidle" });
+    await page.goto("/todo");
 
     await page.getByPlaceholder("Add a task...").fill("Complete Me");
     await page.getByPlaceholder("Add a task...").press("Enter");
@@ -33,7 +33,7 @@ test.describe("Tasks", () => {
   });
 
   test("can delete a task", async ({ page }) => {
-    await page.goto("/todo", { waitUntil: "networkidle" });
+    await page.goto("/todo");
 
     await page.getByPlaceholder("Add a task...").fill("Delete Me");
     await page.getByPlaceholder("Add a task...").press("Enter");

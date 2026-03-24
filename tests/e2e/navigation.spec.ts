@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/auth";
 
 test.describe("Navigation", () => {
   test("can navigate from habits to tasks", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "networkidle" });
+    await page.goto("/dashboard");
 
     await page.locator("button:has-text('E')").first().click();
     await page.getByRole("menuitem", { name: "Tasks" }).click();
@@ -12,7 +12,7 @@ test.describe("Navigation", () => {
   });
 
   test("can navigate from tasks to habits", async ({ page }) => {
-    await page.goto("/todo", { waitUntil: "networkidle" });
+    await page.goto("/todo");
 
     await page.locator("button:has-text('E')").first().click();
     await page.getByRole("menuitem", { name: "Habits" }).click();
