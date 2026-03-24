@@ -17,6 +17,9 @@ export default defineConfig({
     baseURL: `http://localhost:${E2E_PORT}`,
     trace: "on-first-retry",
     actionTimeout: process.env.CI ? 15000 : 5000,
+    contextOptions: {
+      reducedMotion: "reduce",
+    },
   },
   projects: [
     {
