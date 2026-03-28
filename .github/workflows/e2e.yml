@@ -3,13 +3,22 @@ name: E2E Tests
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
 
     services:
       postgres:
@@ -18,8 +27,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: habits_test
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -28,7 +35,7 @@ jobs:
 
     env:
       NODE_ENV: test
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/habits_test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/habits_test
       BETTER_AUTH_SECRET: e2e-test-secret-that-is-long-enough-for-validation
       BETTER_AUTH_URL: http://localhost:3001
       GOOGLE_CLIENT_ID: test-google-client-id
@@ -51,21 +58,6 @@ jobs:
 
       - name: Push DB schema
         run: pnpm db:push
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
-
-      - name: Install Playwright OS deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
 
       - name: Run e2e tests
         run: pnpm test:e2e
