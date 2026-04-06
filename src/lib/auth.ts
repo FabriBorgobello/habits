@@ -32,6 +32,9 @@ export const auth = betterAuth({
     : {}),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ["http://localhost:3000", "http://localhost:3001", "https://habits.f0.ar"],
+  trustedOrigins:
+    process.env.NODE_ENV === "production"
+      ? ["https://habits.f0.ar"]
+      : ["http://localhost:3000", "http://localhost:3001", "https://habits.f0.ar"],
   plugins: [...(isTest ? [testUtils()] : []), tanstackStartCookies()],
 });
