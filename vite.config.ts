@@ -15,13 +15,7 @@ const config = defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  plugins: [
-    devtools(),
-    nitro({ serverDir: true }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
+  plugins: [devtools(), nitro({ serverDir: true }), tailwindcss(), tanstackStart(), viteReact()],
   optimizeDeps: {
     // Exclude TanStack Start packages from Vite's dependency optimization
     // to prevent issues with virtual imports (#tanstack-router-entry, etc.)
