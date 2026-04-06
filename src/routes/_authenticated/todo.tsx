@@ -6,6 +6,12 @@ import { useCreateTodo, useTodos } from "@/hooks/use-todos";
 
 export const Route = createFileRoute("/_authenticated/todo")({
   component: TodoPage,
+  head: () => ({
+    meta: [
+      { title: "Tasks | Habits" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function TodoPage() {
