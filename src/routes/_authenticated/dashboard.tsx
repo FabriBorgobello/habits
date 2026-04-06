@@ -16,10 +16,7 @@ import { getCurrentWeekView, toDateString } from "@/lib/date-utils";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
   head: () => ({
-    meta: [
-      { title: "Dashboard | Habits" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Dashboard | Habits" }, { name: "robots", content: "noindex" }],
   }),
   validateSearch: (search: Record<string, unknown>) => ({
     week: (search.week as string) || undefined,

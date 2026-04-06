@@ -113,8 +113,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
           name: "Habits",
-          description:
-            "Track your daily habits, build streaks, and stay consistent.",
+          description: "Track your daily habits, build streaks, and stay consistent.",
           applicationCategory: "LifestyleApplication",
           operatingSystem: "Web",
           url: "https://habits.f0.ar",
