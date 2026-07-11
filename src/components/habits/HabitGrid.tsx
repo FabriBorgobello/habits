@@ -15,6 +15,7 @@ import { useReorderHabits, useToggleCompletion } from "@/hooks/use-habits";
 import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
 import { getWeeklyProgress, isHabitDueOnDate } from "@/lib/habit-logic";
+import { getSquareState, squareColorClasses } from "@/lib/habit-square";
 import { cn } from "@/lib/utils";
 
 interface HabitGridProps {
@@ -238,6 +239,7 @@ function HabitRow({
             const isCompleted = completions.includes(dateStr);
             const isDue = isHabitDueOnDate(habit, day);
             const isTodaySquare = isToday(day);
+            const squareState = getSquareState(isDue, isCompleted);
 
             return (
               <motion.button
@@ -261,9 +263,8 @@ function HabitRow({
                   isTodaySquare &&
                     isDue &&
                     "ring-1 sm:ring-2 ring-zinc-500 ring-offset-1 sm:ring-offset-2 ring-offset-zinc-950",
-                  !isDue && "opacity-30 cursor-not-allowed bg-zinc-800 border border-zinc-700",
-                  isDue && !isCompleted && "bg-[color-mix(in_srgb,var(--habit-color)_20%,black)] hover:opacity-80",
-                  isDue && isCompleted && "bg-(--habit-color) hover:opacity-80",
+                  squareColorClasses(squareState),
+                  isDue ? "hover:opacity-80" : "cursor-not-allowed",
                 )}
                 aria-label={`${isCompleted ? "Unmark" : "Mark"} ${habit.name} as complete for ${dateStr}`}
               />

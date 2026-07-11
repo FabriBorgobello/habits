@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { CheckSquare, LayoutDashboard, LogOut } from "lucide-react";
+import { BarChart3, CheckSquare, LayoutDashboard, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,6 +62,12 @@ function AuthenticatedLayout() {
                   <Link to="/todo">
                     <CheckSquare className="mr-2 h-4 w-4" />
                     Tasks
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/reports" search={{ view: "month", date: undefined }}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Reports
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
