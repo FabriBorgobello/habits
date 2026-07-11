@@ -1,4 +1,7 @@
 node_modules
+# Local-only pnpm build-approval policy (patched pnpm on dev machines);
+# the container uses vanilla pnpm via corepack and must not read it.
+pnpm-workspace.yaml
 .output
 .nitro
 .tanstack
