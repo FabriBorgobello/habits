@@ -24,10 +24,6 @@
     "test:e2e:ui": "playwright test --ui",
     "prepare": "husky"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"],
-    "ignoredBuiltDependencies": ["@prisma/engines", "prisma"]
-  },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
