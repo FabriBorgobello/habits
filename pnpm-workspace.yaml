@@ -1,8 +1,8 @@
-# pnpm 11 reads per-project settings here (the package.json "pnpm" field is
-# ignored). Standard keys, understood by vanilla pnpm via corepack, so this
-# file is safe to include in the Docker build context.
-onlyBuiltDependencies:
-  - esbuild
-ignoredBuiltDependencies:
-  - '@prisma/engines'
-  - prisma
+# Build-approval policy for pnpm 11 (allowBuilds). This same pnpm runs both
+# on dev machines and in the Docker image (corepack), and it only honors
+# allowBuilds — not onlyBuiltDependencies/ignoredBuiltDependencies. The file
+# must be COPY'd into the build stage before `pnpm install` (see Dockerfile).
+allowBuilds:
+  '@prisma/engines': false
+  esbuild: true
+  prisma: false
