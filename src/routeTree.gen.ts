@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthenticatedTodoRouteImport } from './routes/_authenticated/todo'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedImportGuideRouteImport } from './routes/_authenticated/import-guide'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -41,6 +42,12 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedImportGuideRoute =
+  AuthenticatedImportGuideRouteImport.update({
+    id: '/import-guide',
+    path: '/import-guide',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -55,6 +62,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/import-guide': typeof AuthenticatedImportGuideRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/todo': typeof AuthenticatedTodoRoute
   '/api/health': typeof ApiHealthRoute
@@ -63,6 +71,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/import-guide': typeof AuthenticatedImportGuideRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/todo': typeof AuthenticatedTodoRoute
   '/api/health': typeof ApiHealthRoute
@@ -73,6 +82,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/import-guide': typeof AuthenticatedImportGuideRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/todo': typeof AuthenticatedTodoRoute
   '/api/health': typeof ApiHealthRoute
@@ -83,17 +93,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/import-guide'
     | '/reports'
     | '/todo'
     | '/api/health'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/reports' | '/todo' | '/api/health' | '/api/auth/$'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/import-guide'
+    | '/reports'
+    | '/todo'
+    | '/api/health'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_authenticated/dashboard'
+    | '/_authenticated/import-guide'
     | '/_authenticated/reports'
     | '/_authenticated/todo'
     | '/api/health'
@@ -144,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/import-guide': {
+      id: '/_authenticated/import-guide'
+      path: '/import-guide'
+      fullPath: '/import-guide'
+      preLoaderRoute: typeof AuthenticatedImportGuideRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -163,12 +189,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedImportGuideRoute: typeof AuthenticatedImportGuideRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedTodoRoute: typeof AuthenticatedTodoRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedImportGuideRoute: AuthenticatedImportGuideRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedTodoRoute: AuthenticatedTodoRoute,
 }
