@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { habitCompletions, habits, insertHabitSchema } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { computeHabitStats } from "@/lib/habit-stats";
 
 /**
  * Get current user from session, throws if not authenticated
@@ -66,6 +67,55 @@ export const getHabitsWithCompletionsFn = createServerFn({ method: "GET" })
       habits: userHabits,
       completions: completionsByHabit,
     };
+  });
+
+/**
+ * Compute per-habit stats (current/longest streak, rolling 30-day rate) across
+ * the full completion history. `today` is supplied by the client so streaks
+ * respect the user's timezone rather than the server's.
+ */
+export const getHabitStatsFn = createServerFn({ method: "GET" })
+  .inputValidator((data) =>
+    z
+      .object({
+        today: z.string(), // YYYY-MM-DD in the client's timezone
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const user = await requireUser();
+
+    const userHabits = await db.query.habits.findMany({
+      where: and(eq(habits.userId, user.id), eq(habits.isArchived, false)),
+    });
+
+    if (userHabits.length === 0) {
+      return {} as Record<string, ReturnType<typeof computeHabitStats>>;
+    }
+
+    const habitIds = userHabits.map((h) => h.id);
+
+    // Full history — streaks and the 30-day window both need dates outside any
+    // single report period.
+    const completionsData = await db.query.habitCompletions.findMany({
+      where: inArray(habitCompletions.habitId, habitIds),
+    });
+
+    const completionsByHabit: Record<string, string[]> = {};
+    for (const completion of completionsData) {
+      if (!completionsByHabit[completion.habitId]) {
+        completionsByHabit[completion.habitId] = [];
+      }
+      completionsByHabit[completion.habitId].push(completion.completedDate);
+    }
+
+    const today = new Date(`${data.today}T00:00:00`);
+    const stats: Record<string, ReturnType<typeof computeHabitStats>> = {};
+    for (const habit of userHabits) {
+      stats[habit.id] = computeHabitStats(habit, completionsByHabit[habit.id] ?? [], today);
+    }
+
+    return stats;
   });
 
 /**

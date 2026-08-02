@@ -1,9 +1,10 @@
 import confetti from "canvas-confetti";
-import { Archive, GripVertical, MoreVertical, Pencil } from "lucide-react";
+import { Archive, GripVertical, MoreVertical, Pencil, Trophy } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useMemo } from "react";
 import { useWebHaptics } from "web-haptics/react";
 import { CategoryBadge } from "@/components/habits/CategoryBadge";
+import { StreakBadge } from "@/components/habits/StreakBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +17,13 @@ import { getDayAbbreviation, isToday, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
 import { getWeeklyProgress, isHabitDueOnDate } from "@/lib/habit-logic";
 import { getSquareState, squareColorClasses } from "@/lib/habit-square";
+import { formatStreak, type HabitStats } from "@/lib/habit-stats";
 import { cn } from "@/lib/utils";
 
 interface HabitGridProps {
   habits: Habit[];
   completions: Record<string, string[]>;
+  stats: Record<string, HabitStats>;
   weekDays: Date[];
   categories: Category[];
   hideNonDueToday: boolean;
@@ -32,6 +35,7 @@ interface HabitGridProps {
 export function HabitGrid({
   habits,
   completions,
+  stats,
   weekDays,
   categories,
   hideNonDueToday,
@@ -125,6 +129,7 @@ export function HabitGrid({
               key={habit.id}
               habit={habit}
               completions={completions[habit.id] || []}
+              stats={stats[habit.id]}
               weekDays={weekDays}
               category={categoryMap.get(habit.category)}
               index={index}
@@ -149,6 +154,7 @@ export function HabitGrid({
 interface HabitRowProps {
   habit: Habit;
   completions: string[];
+  stats?: HabitStats;
   weekDays: Date[];
   category?: Category;
   index: number;
@@ -161,6 +167,7 @@ interface HabitRowProps {
 function HabitRow({
   habit,
   completions,
+  stats,
   weekDays,
   category,
   index,
@@ -218,6 +225,16 @@ function HabitRow({
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
               {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
+              {stats && <StreakBadge current={stats.current} unit={stats.unit} />}
+              {stats && stats.longest > 1 && stats.longest > stats.current && (
+                <span
+                  className="inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-medium text-gray-500"
+                  title={`Longest streak: ${formatStreak(stats.longest, stats.unit)}`}
+                >
+                  <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  Best {formatStreak(stats.longest, stats.unit)}
+                </span>
+              )}
               {weeklyProgress && (
                 <span
                   className={cn(
