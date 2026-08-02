@@ -225,16 +225,6 @@ function HabitRow({
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
               {habit.category && <CategoryBadge name={habit.category} colorHex={category?.colorHex} />}
-              {stats && <StreakBadge current={stats.current} unit={stats.unit} />}
-              {stats && stats.longest > 1 && stats.longest > stats.current && (
-                <span
-                  className="inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-medium text-gray-500"
-                  title={`Longest streak: ${formatStreak(stats.longest, stats.unit)}`}
-                >
-                  <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  Best {formatStreak(stats.longest, stats.unit)}
-                </span>
-              )}
               {weeklyProgress && (
                 <span
                   className={cn(
@@ -246,6 +236,20 @@ function HabitRow({
                 </span>
               )}
             </div>
+            {stats && (stats.current > 0 || (stats.longest > 1 && stats.longest > stats.current)) && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <StreakBadge current={stats.current} unit={stats.unit} />
+                {stats.longest > 1 && stats.longest > stats.current && (
+                  <span
+                    className="inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-medium text-gray-500"
+                    title={`Longest streak: ${formatStreak(stats.longest, stats.unit)}`}
+                  >
+                    <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    Best {formatStreak(stats.longest, stats.unit)}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
