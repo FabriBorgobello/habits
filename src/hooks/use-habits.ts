@@ -2,9 +2,11 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { toast } from "sonner";
 import type { z } from "zod";
 import type { insertHabitSchema } from "@/db/schema";
+import { toDateString } from "@/lib/date-utils";
 import {
   archiveHabitFn,
   createHabitFn,
+  getHabitStatsFn,
   getHabitsWithCompletionsFn,
   reorderHabitsFn,
   toggleHabitCompletionFn,
@@ -25,6 +27,18 @@ export function useHabits(startDate: string, endDate: string) {
 }
 
 /**
+ * Fetch per-habit stats (streaks + rolling 30-day rate) over full history.
+ * Keyed by the client's local date so streaks roll over at the user's midnight.
+ */
+export function useHabitStats() {
+  const today = toDateString(new Date());
+  return useQuery({
+    queryKey: ["habit-stats", today],
+    queryFn: () => getHabitStatsFn({ data: { today } }),
+  });
+}
+
+/**
  * Create a new habit
  */
 export function useCreateHabit() {
@@ -34,6 +48,7 @@ export function useCreateHabit() {
     mutationFn: (data: InsertHabit) => createHabitFn({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats"] });
       toast.success("Habit created successfully");
     },
     onError: (error) => {
@@ -53,6 +68,7 @@ export function useUpdateHabit() {
     mutationFn: (data: InsertHabit & { id: string }) => updateHabitFn({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats"] });
       toast.success("Habit updated successfully");
     },
     onError: (error) => {
@@ -112,6 +128,7 @@ export function useToggleCompletion() {
     onSettled: () => {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats"] });
     },
   });
 }
@@ -126,6 +143,7 @@ export function useArchiveHabit() {
     mutationFn: (data: { id: string }) => archiveHabitFn({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats"] });
       toast.success("Habit archived");
     },
     onError: (error) => {
@@ -175,6 +193,7 @@ export function useReorderHabits() {
     onSettled: () => {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats"] });
     },
   });
 }

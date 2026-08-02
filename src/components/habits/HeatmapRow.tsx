@@ -1,4 +1,5 @@
 import { format, isAfter, isBefore, startOfDay } from "date-fns";
+import { Flame, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import { CategoryBadge } from "@/components/habits/CategoryBadge";
 import { ReportSquare } from "@/components/habits/ReportSquare";
@@ -7,6 +8,7 @@ import { isToday, type ReportView, toDateString } from "@/lib/date-utils";
 import { DEFAULT_COLOR, DEFAULT_ICON } from "@/lib/habit-constants";
 import { isHabitDueOnDate } from "@/lib/habit-logic";
 import type { SquareState } from "@/lib/habit-square";
+import { formatStreak, type HabitStats } from "@/lib/habit-stats";
 import { computeCompletionStats, formatRate, getFrequencyLabel } from "@/lib/report-stats";
 import { cn } from "@/lib/utils";
 
@@ -24,14 +26,25 @@ interface HeatmapRowProps {
   periodEnd: Date;
   view: ReportView;
   category?: Category;
+  /** All-time streaks + rolling 30-day rate. Undefined while loading. */
+  stats?: HabitStats;
 }
 
-export function HeatmapRow({ habit, completions, days, periodStart, periodEnd, view, category }: HeatmapRowProps) {
+export function HeatmapRow({
+  habit,
+  completions,
+  days,
+  periodStart,
+  periodEnd,
+  view,
+  category,
+  stats,
+}: HeatmapRowProps) {
   const color = habit.colorHex || DEFAULT_COLOR;
   const icon = habit.icon || DEFAULT_ICON;
   const size = SIZES[view];
 
-  const stats = useMemo(
+  const periodStats = useMemo(
     () => computeCompletionStats(habit, completions, periodStart, periodEnd),
     [habit, completions, periodStart, periodEnd],
   );
@@ -75,12 +88,33 @@ export function HeatmapRow({ habit, completions, days, periodStart, periodEnd, v
         <span
           className={cn(
             "text-sm sm:text-base font-semibold tabular-nums shrink-0",
-            stats.rate === null ? "text-gray-600" : "text-white",
+            periodStats.rate === null ? "text-gray-600" : "text-white",
           )}
+          title="Completion rate this period"
         >
-          {formatRate(stats.rate)}
+          {formatRate(periodStats.rate)}
         </span>
       </div>
+
+      {/* Streaks + rolling 30-day rate across all history */}
+      {stats && (
+        <div className="flex items-center gap-3 text-[10px] sm:text-xs text-gray-400">
+          <span
+            className={cn("inline-flex items-center gap-1", stats.current > 0 && "text-orange-400 font-medium")}
+            title="Current streak"
+          >
+            <Flame className={cn("w-3.5 h-3.5", stats.current > 0 && "fill-orange-500/30")} />
+            {stats.current > 0 ? formatStreak(stats.current, stats.unit) : "No streak"}
+          </span>
+          <span className="inline-flex items-center gap-1" title="Longest streak">
+            <Trophy className="w-3.5 h-3.5" />
+            Best {formatStreak(stats.longest, stats.unit)}
+          </span>
+          <span className="tabular-nums ml-auto" title="Completion rate over the last 30 days">
+            {formatRate(stats.rate30)} <span className="text-gray-600">30d</span>
+          </span>
+        </div>
+      )}
 
       {/* Heatmap: one square per day, wrapping to fill the width */}
       <div className={cn("flex flex-wrap", size.gap)}>

@@ -5,7 +5,7 @@ import { useWebHaptics } from "web-haptics/react";
 import { HeatmapRow } from "@/components/habits/HeatmapRow";
 import type { Category } from "@/db/schema";
 import { useCategories } from "@/hooks/use-categories";
-import { useHabits } from "@/hooks/use-habits";
+import { useHabitStats, useHabits } from "@/hooks/use-habits";
 import { getPeriodRange, type ReportView, shiftAnchor, toDateString } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +50,7 @@ function ReportsPage() {
 
   const { data, isLoading, isPlaceholderData } = useHabits(toDateString(period.start), toDateString(period.end));
   const { data: categoriesData } = useCategories();
+  const { data: statsData } = useHabitStats();
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, Category>();
@@ -158,6 +159,7 @@ function ReportsPage() {
                 periodEnd={period.end}
                 view={view}
                 category={categoryMap.get(habit.category)}
+                stats={statsData?.[habit.id]}
               />
             ))
           )}

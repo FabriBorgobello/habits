@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { Habit } from "@/db/schema";
 import { useCategories } from "@/hooks/use-categories";
-import { useArchiveHabit, useHabits } from "@/hooks/use-habits";
+import { useArchiveHabit, useHabitStats, useHabits } from "@/hooks/use-habits";
 import { getCurrentWeekView, toDateString } from "@/lib/date-utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -55,6 +55,7 @@ function DashboardPage() {
   // Fetch data
   const { data, isLoading, isPlaceholderData } = useHabits(startDateStr, endDateStr);
   const { data: categoriesData } = useCategories();
+  const { data: statsData } = useHabitStats();
   const archiveHabit = useArchiveHabit();
 
   // Filter habits by category
@@ -244,6 +245,7 @@ function DashboardPage() {
             <HabitGrid
               habits={filteredHabits}
               completions={data?.completions || {}}
+              stats={statsData || {}}
               weekDays={weekView.days}
               categories={categoriesData || []}
               hideNonDueToday={hideNonDueToday}
